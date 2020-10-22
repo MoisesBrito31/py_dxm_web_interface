@@ -1,7 +1,4 @@
 import subprocess
-from threading import Thread
-
-from server.server.Modbus import ModbusDados
 
 
 def startServer():
@@ -11,6 +8,4 @@ def startServer():
         text=True,
     )
 
-
-server = Thread(target=ModbusDados, args=['192.168.0.100'])
-server.run()
+startServer()
