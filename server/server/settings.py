@@ -128,3 +128,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 print(BASE_DIR)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+from server.Modbus import Servico
+
+servico = Servico('192.168.0.100')
+
