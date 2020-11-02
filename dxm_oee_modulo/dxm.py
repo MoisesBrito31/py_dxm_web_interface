@@ -2,11 +2,16 @@ from time import sleep
 from threading import Thread
 from pyModbusTCP.client import ModbusClient as Modbus
 from oee_modulo.oee import OEE
+from protocolo.mapa import Mapa
 
-oee = OEE(1)
+
+mapa = Mapa(nome='base', nomeArquivo='base.mapa' ,pasta='mapas')
+oee = OEE(1,endereco='192.168.0.100')
+
 
 
 class Servico():
+    oee = OEE(1)
     dados = []
     dadosAux = []
     __contReadTCP = True
@@ -17,8 +22,9 @@ class Servico():
     execSetup = False
     thrTCP = Thread()
 
-    def __init__(self, ip):
-        self.ip = ip
+    def __init__(self, OEE:oee):
+        self.oee = oee
+        self.ip = self.oee.DXM_Endress
         for x in range(240):
             self.dados.append(0)
         self.thr = Thread(target=self._setupTCP)
@@ -92,6 +98,6 @@ class Servico():
         self.__contSetupTCP = False
         self.__contProssTCP = False
 
-d = Servico(oee.DXM_Endress)
+d = Servico(oee)
 
 print(d.statusSocket)
