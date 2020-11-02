@@ -1,6 +1,9 @@
 from time import sleep
 from threading import Thread
 from pyModbusTCP.client import ModbusClient as Modbus
+from oee_modulo.oee import OEE
+
+oee = OEE(1)
 
 
 class Servico():
@@ -89,27 +92,6 @@ class Servico():
         self.__contSetupTCP = False
         self.__contProssTCP = False
 
+d = Servico(oee.DXM_Endress)
 
-print('inicio...')
-
-d = Servico('192.168.0.100')
-contProg = True
-while contProg:
-    cmd = input('comando: ')
-    if cmd == 'sts':
-        # print('sts')
-        print(d.statusTcp)
-    if cmd == 'exit':
-        # print('exit')
-        d.close()
-        contProg = False
-    if cmd.find('ip') >= 0:
-        ip = cmd.split(',')[1]
-        d.ip = ip
-        #print('vc digitou: {}'.format(ip))
-        d.execSetup = True
-    if cmd.find('rd')>=0:
-        start = int(cmd.split(',')[1])
-        qtd = int(cmd.split(',')[2])
-        print(d.dados[start:start+qtd])
-print('fim...')
+print(d.statusSocket)

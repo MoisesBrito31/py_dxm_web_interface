@@ -194,3 +194,5 @@ class ErroView(View):
         except:
             mensagem = "Falha desconhecida"
         return render(request, 'erro.html', context={'msg': mensagem})
+
+

@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
+    'oee',
 ]
 
 MIDDLEWARE = [
@@ -129,7 +130,7 @@ print(BASE_DIR)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-from server.Modbus import Servico
 
-servico = Servico('192.168.0.100')
+
+
 
