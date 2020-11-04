@@ -1,4 +1,6 @@
 from datetime import datetime
+import pickle
+import os
 
 
 class Hist():
@@ -63,7 +65,7 @@ class Linha():
     filtro_ini:datetime
     filter_fim:datetime
 
-    def insert_dinamics(self,values:list):
+    def insert_dinamics(self,values):
         cont_in_b1 = values[0]
         cont_in_b2 = values[1]
         cont_out_b1 = values[2]
@@ -80,8 +82,8 @@ class Linha():
             self.maq_sts = bool(values[4])
         except:
             pass
-        self.cont_in = cont_in_b2+cont_in_b2*65536
-        self.cont_out = cont_out_b2+cont_out_b2*65536
+        self.cont_in = cont_in_b2+(cont_in_b1*65536)
+        self.cont_out = cont_out_b2+(cont_out_b1*65536)
         if self.maq_sts:
             self.estado = 'Parado'
         else:
@@ -277,15 +279,21 @@ class Linha():
         self.histFiltro = temp
 
 class OEE():
+    pasta = ''
+    nomeArquivo = 'OEE.bin'
+    arquivo = f'{pasta}\{nomeArquivo}'
     linhas:Linha=[]
     quantidade:int
     DXM_Status:str
-    DXM_Endress:str = '192.168.0.4'
+    DXM_Endress:str = '192.168.0.1'
     DXM_Tcp:bool = True
     emulador:int=0
     tickLog:int=60
 
-    def __init__(self,qtd:int,linhas=[],endereco='192.168.0.4',emulador=0,tickLog=60):
+    def __init__(self,qtd:int,linhas=[],endereco='192.168.0.4',emulador=0,tickLog=60,pasta='',arquivo='OEE.bin'):
+        self.pasta = pasta
+        self.nomeArquivo = arquivo
+        self.arquivo = f'{pasta}\{arquivo}'
         if len(linhas)<= 0:
             for x in range(qtd):
                 l = Linha()
@@ -337,4 +345,27 @@ class OEE():
         if len(self.linhas) != self.quantidade:
             self.alteraLinhas(self.quantidade) 
 
+    @staticmethod
+    def carrega(pasta,nomeArquivo):
+        try:
+            arquivo = open(f'{pasta}\{nomeArquivo}','rb')
+            pic = pickle.load(arquivo)
+            arquivo.close()
+            return pic
+        except Exception as e:
+            print(f'falha ao carregar OEE {str(e)}')
+            return OEE(1,endereco='192.168.0.100',pasta=pasta, arquivo=nomeArquivo)
 
+    def salva(self):
+        try:
+            try:
+                os.mkdir(self.pasta)
+                print(f"criou a pasta {self.pasta}")
+            except:
+                pass
+            arquivo = open(self.arquivo,'wb')
+            pickle.dump(self,arquivo)
+            arquivo.close()
+            print(f'criou o arquivo {self.arquivo}')
+        except Exception as e:
+            print(f'falha ao salvar OEE{str(e)}')

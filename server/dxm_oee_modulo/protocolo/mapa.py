@@ -93,13 +93,13 @@ class Mapa():
     @staticmethod
     def carrega(pasta,nomeArquivo):
         try:
-            arquivo = open(f'{pasta}{nomeArquivo}','rb')
+            arquivo = open(f'{pasta}\{nomeArquivo}','rb')
             pic = pickle.load(arquivo)
             arquivo.close()
             return pic
-
         except Exception as e:
             print(f'falha ao carregar mapa {str(e)}')
+            return Mapa(nomeArquivo=nomeArquivo,pasta=pasta,inicia=True)
 
     def salva(self):
         try:
@@ -107,7 +107,7 @@ class Mapa():
                 os.mkdir(self.pasta)
             except:
                 pass
-            arquivo = open(f'{self.pasta}{self.nomeArquivo}','wb')
+            arquivo = open(f'{self.pasta}\{self.nomeArquivo}','wb')
             pickle.dump(self,arquivo)
             arquivo.close()
 
@@ -149,9 +149,6 @@ class Mapa():
         turnos.append(e)
         self.blocos = blocos
         self.turnos = turnos
-        self.pasta = 'mapas/'
-        self.nome = 'base'
-        self.nomeArquivo = 'base.mapa'
         self.qntEquip = 1
         self.salva()
 
