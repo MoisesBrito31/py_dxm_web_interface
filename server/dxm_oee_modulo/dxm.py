@@ -15,19 +15,17 @@ oee = OEE.carrega('store','OEE.bin')
 class Servico():
     oee = OEE(1)
     __contProssTCP = True
+    __controleRead = True
     statusTcp = 'iniciado...'
     execSetup = False
 
     def __init__(self, OEE:oee):
         self.oee = oee
-        self.dxm = Modbus(host=self.oee.DXM_Endress,port=502)
-        self.dxm.open()
-        self.loop_tcp()
+        self._setupTCP()
 
 
-    def _readTCP(self):
+    def ler(self):
         linha = self.dxm.read_holding_registers(89,1)[0]
-        print(f' linha = {linha}')
         if linha:
             if linha > 0:
                 self.oee.alteraLinhas(linha)
@@ -37,22 +35,40 @@ class Servico():
                 self.oee.linhas[x].insert_calculadas(self.dxm.read_holding_registers(100+x*13,13))
             self.statusTcp = 'dxm OnLine'
             sleep(1)
+            return True
         else:
             print('falha na leitura 1')
             self.statusTcp = 'dxm OffLine'
             sleep(2)
-       
+            return False
 
+    def _readTCP(self):
+        while self.__controleRead== True:
+           self.ler()
+       
     def _setupTCP(self):
         print('setupTcp...')
+        self.__controleRead = False
+        sleep(4)
         try:
-            self.dxm.host = self.oee.DXM_Endress
+            try:
+                if self.dxm.is_open():
+                    self.dxm.close()
+            except:
+                pass
+            self.dxm = Modbus(host=self.oee.DXM_Endress,port=502)
+            self.dxm.open()
             retorno = self.dxm.read_holding_registers(0,1)
             if retorno:
                 self.statusTcp = 'dxm OnLine'
+                if self.ler():
+                    self.oee.salva()
+                    self.th = Thread(target=self._readTCP)
+                    self.th.start()
             else:
                 self.statusTcp = 'dxm OffLine'
         except:
+            self.statusTcp = 'dxm OffLine'
             print('falha no setup')
             sleep(5)
                 
@@ -74,7 +90,7 @@ class Servico():
 servico = Servico(oee)
 
 
-#"""
+"""
 while True:
     if servico.statusTcp.find('OnLine')>=0:
         print(f'contador 1: {servico.oee.linhas[0].cont_in}')
@@ -85,4 +101,4 @@ while True:
     print(f'Estado: {servico.statusTcp}',servico.oee.DXM_Endress,sep='\t')
     print('')
     sleep(2)
-#"""
+"""
