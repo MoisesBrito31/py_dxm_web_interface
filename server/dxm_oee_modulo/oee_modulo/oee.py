@@ -330,10 +330,8 @@ class OEE():
                 l.id = x
                 self.linhas.append(l)
         if result < 0:
-            index=len(self.linhas)
-            for x in range(self.quantidade-num):
-                self.linhas.remove(index)
-                index-=1
+            self.linhas = self.linhas[0:self.quantidade-num]
+               
         self.quantidade = len(self.linhas)
 
     def flush(self):
