@@ -56,7 +56,7 @@ class Linha():
     forma:int=0
     t_par:int=0
     t_prod:int=0
-    t_par_prog:int=0
+    t_p_prog:int=0
 
     #variaveis de banco:
     historico:Hist = []
@@ -102,7 +102,7 @@ class Linha():
         self.vel_esp = values[7]
         self.buffer = values[8]
         self.forma = values[9]
-        self.t_par_prog = values[10]
+        self.t_p_prog = values[10]
         self.t_par = values[11]
         self.t_prod = values[12]
 

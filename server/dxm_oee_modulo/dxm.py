@@ -53,8 +53,10 @@ class Servico():
         while self.__controleRead== True:
             if self.ler():
                 self.statusTcp = 'dxm OnLine'
+                self.oee.DXM_insertOnLine()
             else:
                 self.statusTcp = 'dxm OffLine'
+                self.oee.DXM_insertFalha()
                 sleep(5)
        
     def _setupTCP(self):
@@ -99,28 +101,22 @@ class Servico():
                 
     
     def close(self):
-        self.__contProssTCP = False 
+        self.__controleRead = False 
         self.dxm.close()
 
 servico = Servico(oee)
 
 
-#"""
-def leitu():
-    while True:
-        if servico.statusTcp.find('OnLine')>=0:
-            print(f'contador 1: {servico.oee.linhas[0].cont_in}')
-            print(f'contador 2: {servico.oee.linhas[0].cont_out}')
-            print(f'estado: {servico.oee.linhas[0].maq_sts}')   
-            print(f'velo esp: {servico.oee.linhas[0].vel_esp}')
-            print('')
-        else:
-            sleep(4)
-        print(f'Estado: {servico.statusTcp}',servico.oee.DXM_Endress,sep='\t')
-        print('')
-        sleep(2)
-#"""
 
-#l = Thread(target=leitu)
-#l.start()
-#leitu()
+def leitu():
+    controle = True
+    while controle:
+        cmd = input()
+        if cmd == 'exit':
+            servico.close()
+            controle = False
+    print('fim...')
+
+
+l = Thread(target=leitu)
+l.start()

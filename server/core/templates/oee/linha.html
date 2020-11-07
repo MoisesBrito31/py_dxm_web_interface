@@ -1,0 +1,364 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block context %}
+
+<div class="card-title mt-5 mb-3 pt-3">
+    <div class="row">
+        <div class="col text-left"><h2>{{dados.nome}}</h2></div>    
+        <div class="col text-right">
+            <div class="btn-group">
+                <button type="button" class="btn btn-primary" onclick="window.location.href='/oee/'">Fábrica</button>
+                <button type="button" class="btn btn-primary disabled">ao vivo</button>
+                <button type="button" class="btn btn-primary"  onclick="window.location.href='/oee/historico/{{dados.id}}'">Histórico</button>
+                <!--<button type="button" class="btn btn-danger">Zerar</button>-->
+            </div>
+        </div>
+    </div>
+    
+</div>
+<hr>
+<div class="container-fluid m-auto">
+    <div class="row">
+        <div class="col ">
+            <div class="gauge m-auto" id="GOEE"><!--oee gauge aqui--></div>
+            <div class="form-group ">
+                <label>Status:</label>
+                <h2 class="p-2 rounded border border-dark text-center"><span id="estado">{{dados.estado}}</span></h2>
+            </div>
+        </div>
+        <div class="col ">
+            <div class="gauge m-auto" id="Gdis"></div>
+            <div class="form-group ">
+                <label>Operando:</label>
+                <input id="operando" class="form-control text-center" readonly="readonly" value="{{dados.t_prod}}" />
+            </div>
+            <div class="form-group ">
+                <label>Parado:</label>
+                <input id="parado" class="form-control text-center" readonly="readonly" value="{{dados.t_par}}" />
+            </div>
+            <div class="form-group ">
+                <label>Agendado:</label>
+                <input id="agendado" class="form-control text-center" value="" onclick="t_p_progBtnF()" onkeyup="agendadoChange()"/>
+                <div class="row mt-2">
+                    <div class="col">
+                        <button class="btn btn-block btn-primary invisible" type="button" id="t_p_progBtn" onclick="salvaT_p_prog(true)">Salvar</button>
+                    </div>
+                    <div class="col">
+                        <button class="btn btn-block btn-danger invisible" type="button" id="t_p_progCls" onclick="salvaT_p_prog(false)">Cancelar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col ">
+            <div class="gauge m-auto" id="Gq"></div>
+            <div class="form-group ">
+                <label>Produzido:</label>
+                <input id="produzindo" type="text" readonly="readonly" class="form-control text-center" value="{{dados.cont_in}}" />
+            </div>
+            {% if dados.forma == 0 %}
+                <div class="form-group ">
+                    <label>Reprovados:</label>
+                    <input id="aprovado" type="text" readonly="readonly" class="form-control text-center" value="{{dados.cont_out}}" />
+                </div>
+                <div class="form-group ">
+                    <label>Forma de Contagem:</label>
+                    <select class="form-control" id="forma" onchange="formaAsinc()">
+                        <option value="0" selected="selected">Contador de rejeitados</option>
+                        <option value="1">Contador de Aprovados</option>
+                    </select>
+                </div>
+            {% else %}
+                <div class="form-group ">
+                    <label>Aprovados:</label>
+                    <input id="aprovado" type="text" readonly="readonly" class="form-control text-center" value="{{dados.cont_out}}" />
+                </div>
+                <div class="form-group ">
+                    <label>Forma de Contagem:</label>
+                    <select class="form-control" id="forma" onchange="formaAsinc()"> 
+                        <option value="0" >Contador de rejeitados</option>
+                        <option value="1" selected="selected">Contador de Aprovados</option>
+                    </select>
+                </div>
+            {% endif %}
+
+
+
+        </div>
+        <div class="col ">
+            <div class="gauge m-auto" id="Gper"></div>
+            <div class="form-group ">
+                <label>Velocidade Atual:</label>
+                <input id="velocidade" type="text" readonly="readonly" class="form-control text-center" value="{{dados.vel_atu}} p/m" />
+            </div>
+            <div class="form-group ">
+                <label>Esperada:</label>
+                <input id="velo_esp" type="text" class="form-control text-center" value="{{dados.vel_esp}} p/m" onclick="vel_espBtn()" />
+                <div class="row mt-2">
+                    <div class="col">
+                        <button class="btn btn-block btn-primary invisible" type="button" id="vel_espBtn" onclick="salvaVel_esp(true)">Salvar</button>
+                    </div>
+                    <div class="col">
+                        <button class="btn btn-block btn-danger invisible" type="button" id="vel_espCls" onclick="salvaVel_esp(false)">Cancelar</button>
+                    </div>
+                    
+                   
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+    
+<script src="{% static 'js/justgage.js' %}"></script>
+<script src="{% static 'js/raphael-2.1.4.min.js' %}"></script>
+
+<script>
+
+    var ediVel_esp = false
+    var input_h_p_pro =0
+
+    function vel_espBtn() {
+        ediVel_esp = true;
+        document.getElementById("vel_espBtn").setAttribute("class", "btn btn-block btn-primary visible")
+        document.getElementById("vel_espCls").setAttribute("class", "btn btn-block btn-danger visible")
+        document.getElementById("velo_esp").value=""        
+    }
+
+    function salvaVel_esp(acao) {        
+        document.getElementById("vel_espBtn").setAttribute("class", "btn btn-block btn-primary invisible")
+        document.getElementById("vel_espCls").setAttribute("class", "btn btn-block btn-danger invisible")
+            ediVel_esp = false;
+            var valor = document.getElementById("velo_esp").value           
+        if (acao) { esp_velAsinc(valor) }        
+    }
+
+    function esp_velAsinc(valor) {
+        
+          var xhp = new XMLHttpRequest()
+        xhp.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 200) {
+                var re = this.responseText               
+                }
+            }
+        
+        xhp.open("Get", "/oee/set_vel_esp/{{dados.id}}/"+valor);
+        xhp.send();
+    }
+
+
+
+    var editT_p_prog = false
+
+    function agendadoChange() {
+        var valor = document.getElementById("agendado").value
+        var temp = ""
+        var temph = ""
+        var tempm = ""
+        if (valor.indexOf(":")>0) {
+            
+            if (valor.length > 7) {
+                temph = `${valor.substr(1, 1)}${valor.substr(5, 1)}`               
+                tempm = valor.substr(6, 2)               
+            }
+            else {
+                temph = valor.substr(0, 2)
+                tempm = valor.substr(6, 2)                
+            }            
+            temp = `${temph}${tempm}`
+            valor=""
+        }
+        
+        if (valor != "") {
+            for (var x = valor.length; x < 4; x++) {
+                temp = `0${temp}`
+            }
+           
+            temp = temp + valor
+           
+            if (temp.length > 4) {
+                temp = temp.substring(temp.length - 4, 5)
+            }
+
+            temph = temp.substr(0, 2)
+            tempm = temp.substr(2, 2)            
+        }
+        
+        temp = `${temph} : ${tempm}`
+       
+        if (temp.length < 7) {temp=""}
+        document.getElementById("agendado").value = temp
+        input_h_p_pro = parseInt(temph) * 60 + parseInt(tempm)
+       // alert(input_h_p_pro)
+    }
+
+    function t_p_progBtnF() {
+        editT_p_prog = true;
+        document.getElementById("t_p_progBtn").setAttribute("class", "btn btn-block btn-primary visible")
+        document.getElementById("t_p_progCls").setAttribute("class", "btn btn-block btn-danger visible")       
+        document.getElementById("agendado").value = "" 
+    }
+
+    function salvaT_p_prog(acao) {
+        document.getElementById("t_p_progBtn").setAttribute("class", "btn btn-block btn-primary invisible")
+        document.getElementById("t_p_progCls").setAttribute("class", "btn btn-block btn-danger invisible")
+        editT_p_prog = false;
+        var valor = document.getElementById("agendado").value
+        if (acao) { t_p_progAsinc(valor) }
+    }
+
+    function t_p_progAsinc() {
+       
+          var xhp = new XMLHttpRequest()
+        xhp.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 200) {
+                var re = this.responseText               
+                }
+            }
+        
+        xhp.open("Get", "/oee/set_t_p_prog/{{dados.id}}/" + input_h_p_pro);
+        xhp.send();
+    }
+
+    function formaAsinc() {
+          var valor=document.getElementById("forma").value  
+          var xhp = new XMLHttpRequest()
+          xhp.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 200) {
+                var re = this.responseText   
+                    document.location.reload()
+                }
+            }
+        
+        xhp.open("Get", "/oee/set_forma/{{dados.id}}/"+valor);
+        xhp.send();
+    }
+
+    var sectors = [{
+        color: "#c00002",
+        lo: 0,
+        hi: 20,
+    }, {
+        color: "#febf00",
+        lo: 20,
+        hi: 40,
+    }, {
+        color: "#fdf500",
+        lo: 40,
+        hi: 60,
+    }, {
+        color: "#92d14f",
+        lo: 60,
+        hi: 80,
+    }, {
+        color: "#00af50",
+        lo: 80,
+        hi: 100,
+    }];
+
+    var oee = new JustGage({
+        id: "GOEE",
+        value: 100,
+        min: 0,
+        max: 100,
+        title: "OEE",
+        symbol: '%',
+        pointer: true,
+        customSectors: sectors,
+        relativeGaugeSize: true
+    });
+
+    var per = new JustGage({
+        id: "Gper",
+        value: 100,
+        min: 0,
+        max: 100,
+        title: "Performance",
+        symbol: '%',
+        pointer: true,
+        customSectors: sectors,
+        relativeGaugeSize: true
+    });
+
+    var q = new JustGage({
+        id: "Gq",
+        value: 100,
+        min: 0,
+        max: 100,
+        title: "Qualidade",
+        symbol: '%',
+        pointer: true,
+        customSectors: sectors,
+        relativeGaugeSize: true
+    });
+
+    var dis = new JustGage({
+        id: "Gdis",
+        value: 100,
+        min: 0,
+        max: 100,
+        title: "Disponibilidade",
+        symbol: '%',
+        pointer: true,
+        customSectors: sectors,
+        relativeGaugeSize: true
+    });
+
+     oee.refresh({{dados.oee}})
+    dis.refresh({{dados.dis}})
+    q.refresh({{dados.q}})
+    per.refresh({{dados.per}})
+
+    setInterval(function () {
+        getlinhas();
+    }, 1000)
+
+    function getlinhas() {
+        var xhp = new XMLHttpRequest()
+        xhp.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 200) {
+                var re = this.responseText
+                data = JSON.parse(re);                
+                if (data.estado == "DXM OffLine") {
+                    document.location.href = "/oee/offline";
+                }
+                else {
+                    oee.refresh(data.oee)
+                    dis.refresh(data.dis)
+                    q.refresh(data.q)
+                    per.refresh(data.per)
+                    document.getElementById("estado").innerHTML = data.estado;
+                    if (data.estado == "Operando") {
+                        document.getElementById("estado").setAttribute("style","color:green")
+                    }
+                    if (data.estado == "Parada") {
+                        document.getElementById("estado").setAttribute("style","color:red")
+                    }
+                    document.getElementById("operando").value = `${parseInt(data.t_prod / 60)} : ${data.t_prod % 60}`
+                    document.getElementById("parado").value = `${parseInt(data.t_par / 60)} : ${data.t_par%60}`
+                    if (!editT_p_prog) { document.getElementById("agendado").value = `${parseInt(data.t_p_prog / 60)} : ${data.t_p_prog % 60}` }
+                    document.getElementById("produzindo").value = data.cont_in
+                    document.getElementById("aprovado").value = data.cont_out
+                    document.getElementById("velocidade").value = data.vel_atu + " p/min"
+                    if (!ediVel_esp) { document.getElementById("velo_esp").value = data.vel_esp + " p/min"}
+                    
+
+                    }
+                }
+
+            }
+        
+        xhp.open("Get", "/oee/get_linha/{{dados.id}}");
+        xhp.send();
+    }
+</script>
+
+<style>
+    .gauge {
+        min-width: 250px;
+        max-width: 300px;
+    }
+</style>
+
+{% endblock %}
