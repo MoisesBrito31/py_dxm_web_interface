@@ -55,9 +55,7 @@ def set_t_p_prog(request,index,valor):
 
 def conjunto_linhas(request):
     if UserPermission(request, 3):
-        for l in range(len(servico.oee.linhas)):
-            servico.oee.linhas[l].id = l
-        dado = ''
+        dado=''
         for l in servico.oee.linhas:
             dado = f'{dado}{{\"nome\":\"{l.nome}\",\"estado\":\"{l.estado}\",\"oee\":{l.oee}}},'
         dado = dado[0:len(dado)-1]

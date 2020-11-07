@@ -78,6 +78,8 @@ class Servico():
             if retorno:
                 self.statusTcp = 'dxm OnLine'
                 if self.ler():
+                    for l in range(len(self.oee.linhas)):
+                        self.oee.linhas[l].id = l
                     self.oee.salva()
                 #if not self.lendo:
                 self.__controleRead = True
@@ -115,6 +117,8 @@ def leitu():
         if cmd == 'exit':
             servico.close()
             controle = False
+        if cmd == 'sts':
+            print(servico.statusTcp)
     print('fim...')
 
 
