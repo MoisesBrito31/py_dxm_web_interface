@@ -1,0 +1,295 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block context %}
+
+
+<div class="card-title mt-5 mb-3 pt-3">
+    <div class="row mb-5">
+        <div class="col text-left">
+            <h2>Configuração do DXM</h2>
+        </div>
+        <div class="col text-right  btn-group">
+            <button type="button" class="btn btn-primary disabled" onclick="#">Rede</button>
+            <button type="button" class="btn btn-primary " onclick="document.location.href='/config/turno'">Turno</button>
+            <button type="button" class="btn btn-primary" onclick="document.location.href='/config/mapIO'">Mapa I/O</button>
+            <button type="button" class="btn btn-primary" onclick="document.location.href='/config/DxmConfig'">Programar</button>
+            <button type="button" class="btn btn-primary" onclick="document.location.href='/config/reset'">Destravar</button>
+            <!--
+            <button type="button" class="btn btn-primary" onclick="document.location.href='/config/download?arquivo=sb'">script Download</button>
+            <button type="button" class="btn btn-primary" onclick="document.location.href='/config/download?arquivo=xml'">XML Download</button>
+                -->
+        </div>
+    </div>
+    <hr>
+</div>
+
+
+
+
+<div class="container-fluid">
+
+    <div class="mb-4 mt-4">
+        <label>DXM Endereço:</label>
+        <div class="form-inline">
+            <input type="text" id="endress" name="endress" value="{{dados.DXM_Endress}}" class="mr-3 form-control" />
+            <button id="splint" class="btn btn-primary" type="button" onclick="altIp()">
+                Salvar
+            </button>
+        </div>
+    </div>
+
+    {% if dados.statusTcp == 'dxm OnLine' %}
+        <div class="mb-4  mt-4">
+            <label for="linhas">linhas:</label>
+            <div class="form-inline">
+                <input type="number" class="mr-3 form-control" name="linhas" id="linhas" value="{{dados.quantidade}}" />
+                <button id="splint2" class="btn btn-primary " onclick="linhaAltera()" type="button">Alterar</button>
+            </div>
+        </div>
+
+        <div class="mb-4  mt-4">
+            <label for="tickLog">intervalo entre logs(min)</label>
+            <div class="form-inline">
+                <input type="number" class="mr-3 form-control" name="tickLog" id="tickLog" value="{{dados.tickLog}}" />
+                <button class="btn btn-primary " onclick="tickAltera()" type="button">Alterar</button>
+            </div>
+        </div>
+        <hr />
+        
+        for (int x = 0; x < Model.quantidade; x++)
+        {% for l in dados.linhas %}
+            z = x + 1;
+            <div class="mb-4 mt-4 form-row">
+                <div class="col-auto mt-3">
+                    <p>Nome linha {{l.id}} : </p>
+                    <input type="text" id="l {{l.id}}" name="l {{l.id}}" value="{{dados.nome}}" class="mr-3 form-control" />
+                </div>
+                <div class="col-auto mt-3">
+                    <p>Parada Agendado:</p>
+                    <input id="{{l.id}} agendado" class="form-control text-center mr-3" value="{{dados.t_p_prog}} : {{dados.t_p_prog}}" onclick="t_p_progBtnF('{{l.id}} agendado')" onkeyup="agendadoChange('{{l.id}} agendado',{{l.id}})" />
+                </div>
+                <div class="col-auto mt-3">
+                    <p>Forma de Contagem:</p>
+                    {% if l.forma == 0 %}
+                    
+                        <select class="form-control mr-3" id="{{l.id}} forma">
+                            <option value="0" selected="selected">Contador de rejeitados</option>
+                            <option value="1">Contador de Aprovados</option>
+                        </select>
+                    {% else %}
+                        <select class="form-control mr-3" id="{{l.id}} forma">
+                            <option value="0">Contador de rejeitados</option>
+                            <option value="1" selected="selected">Contador de Aprovados</option>
+                        </select>
+                    {% endif %}
+
+                </div>
+                <div class="col-auto mt-3">
+                    <p>Veloc. Esperada (p/m):</p>
+                    <input id="{{l.id}} velo_esp" type="text" class="form-control text-center mr-3" value="{{l.vel_esp}}" />
+                </div>
+                <div class="col-auto mt-3">
+                    <p>ação:</p>
+                    <button class="btn btn-primary" type="button" onclick="altnome({{l.id}})">Salvar </button>
+                    <button class="btn btn-danger" type="button" onclick="zera({{l.id}})">Zerar</button>
+                </div>
+            </div>
+            <hr />
+        }
+
+        <div class="mb-4 mt-4">
+            <label class="mr-3">Emulador: </label>
+            {% if dados.emulador %}
+                <button class="btn btn-primary" onclick="emula({{dados.emulador}})" type="button">
+                    <span id="emul" onclick="emula({{dados.emulador}})">Iniciar emulador</span>
+                </button>
+            {% else %}
+                <button class="btn btn-danger" onclick="emula({{dados.emulador}})" type="button">
+                    <span id="emul" onclick="emula({{dados.emulador}})">Parar emulador</span>
+                </button>
+            {{endif}}
+        </div>
+
+    {% endif %}
+
+</div>
+
+<script>
+    var input_h_p_pro = []
+</script>
+
+
+{% for l in dados.linhas %}
+    <script>
+        input_h_p_pro[{{l.id}}] = {{l.t_p_prog}}
+    </script>
+{% endfor %}
+
+<script>
+   
+    var editT_p_prog = false
+
+
+
+    function altnome(valor) {
+
+        var nome = document.getElementById(`l ${valor}`).value;
+        var form = document.getElementById(`${valor} forma`).value;
+        var vel = document.getElementById(`${valor} velo_esp`).value;
+        var xhp = new XMLHttpRequest()
+
+        xhp.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 200) {
+                var re = this.responseText
+                if (re == "ok") {                    
+                    toastr.success("dados armazenados", "Sucesso")
+                }
+                else {
+                    toastr.error(re, "erro")
+                }
+            }
+        }
+        xhp.open("Get", `/Config/setLinhaNome?id=${valor}&valor=${nome}&t_p_p=${input_h_p_pro[valor]}&forma=${form}&vel_esp=${vel}`);
+        xhp.send();
+    }
+
+    function velAlt(id) {
+        document.getElementById(`${id} velo_esp`).value = ""
+    }
+
+    function altIp() {
+        document.getElementById("splint").innerHTML = "<span class=\"spinner-border spinner-border-sm mr-1\"></span>Alterando...";
+
+        var ip = document.getElementById("endress").value;
+
+        var xhp = new XMLHttpRequest()
+
+        xhp.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 200) {
+                var re = this.responseText
+                setTimeout(document.location.reload(), 10000)
+            }
+        }
+        xhp.open("Get", `/Config/setIp?ip=${ip}`);
+        xhp.send();
+    }
+
+    function zera(valor) {
+        var xhp = new XMLHttpRequest()
+
+        xhp.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 200) {
+                var re = this.responseText
+                if (re == "ok") { toastr.success("contadores Zerados", "Sucesso") }
+                else { toastr.error("não foi possível zerar Contadores", "Falha") }
+            }
+        }
+        xhp.open("Get", `/Config/zerarLinha?id=${valor}`);
+        xhp.send();
+    }
+
+    function linhaAltera() {
+        document.getElementById("splint2").innerHTML = "<span class=\"spinner-border spinner-border-sm mr-1\"></span>Alterando...";
+        var valor = document.getElementById("linhas").value
+        var xhp = new XMLHttpRequest()
+
+        xhp.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 200) {
+                var re = this.responseText
+                setTimeout(document.location.reload(), 2000)
+            }
+        }
+        xhp.open("Get", "/Config/setLinhas?valor=" + valor);
+        xhp.send();
+    }
+
+    function tickAltera() {
+        var valor = document.getElementById("tickLog").value
+        var xhp = new XMLHttpRequest()
+
+        xhp.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 200) {
+                var re = this.responseText
+                setTimeout(document.location.reload(), 2000)
+            }
+        }
+        valor = valor * 60
+        xhp.open("Get", "/Config/setTickLog?valor=" + valor);
+        xhp.send();
+    }
+
+    function emula(valor) {
+
+        if (valor == 0) {
+            valor = 1
+        }
+        else {
+            valor = 0
+        }
+
+        var xhp = new XMLHttpRequest()
+        xhp.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 200) {
+                var re = this.responseText
+                setTimeout(document.location.reload(), 2000)
+
+
+            }
+        }
+        xhp.open("Get", "/Config/emula?valor=" + valor);
+        xhp.send();
+    }
+
+
+
+    function agendadoChange(id, x) {
+        var valor = document.getElementById(id).value
+        var temp = ""
+        var temph = ""
+        var tempm = ""
+        if (valor.indexOf(":") > 0) {
+
+            if (valor.length > 7) {
+                temph = `${valor.substr(1, 1)}${valor.substr(5, 1)}`
+                tempm = valor.substr(6, 2)
+            }
+            else {
+                temph = valor.substr(0, 2)
+                tempm = valor.substr(6, 2)
+            }
+            temp = `${temph}${tempm}`
+            valor = ""
+        }
+
+        if (valor != "") {
+            for (var x = valor.length; x < 4; x++) {
+                temp = `0${temp}`
+            }
+
+            temp = temp + valor
+
+
+
+            if (temp.length > 4) {
+                temp = temp.substring(temp.length - 4, 5)
+            }
+
+            temph = temp.substr(0, 2)
+            tempm = temp.substr(2, 2)
+        }
+
+        temp = `${temph} : ${tempm}`
+
+        if (temp.length < 7) { temp = "" }
+        document.getElementById(id).value = temp
+        input_h_p_pro[x] = parseInt(temph) * 60 + parseInt(tempm)
+        //alert(input_h_p_pro[x])
+    }
+    function t_p_progBtnF(id) {
+        editT_p_prog = true;
+        document.getElementById(id).value = ""
+    }
+
+</script>
+
+{% endblock %}
