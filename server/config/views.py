@@ -8,8 +8,7 @@ from time import sleep
 class IndexView(View):
     def get(self,request):
         dado = servico.oee
-        return render(request,'configurar/index.html',context={'dados':dado})
-        #return logado(,request,titulo='configurar DXM',dados=dado,nivel_min=1)
+        return logado('configurar/index.html',request,titulo='configurar DXM',dados=dado,nivel_min=1)
 
 
 class Set_ip(View):
@@ -29,6 +28,29 @@ class Set_linhas(View):
             sleep(2)
         sleep(3)
         return HttpResponseRedirect('/config')
+
+class Set_dados(View):
+    def post(self,request,valor):
+        try:
+            recb = str(request.POST['agendado']).split(':') 
+            h = int(recb[0])
+            m = int(recb[1])
+            agendado = h*60+m
+            forma = int(request.POST['forma'])
+            nome = str(request.POST['nome'])
+            vel_esp = int(request.POST['vel_esp'])
+            print(f'{valor}: {agendado}, {forma}, {nome}, {vel_esp}')
+            servico.dxm.write_multiple_registers(107+valor*13,[vel_esp])
+            sleep(1)
+            servico.dxm.write_multiple_registers(109+valor*13,[forma])
+            sleep(1)
+            servico.dxm.write_multiple_registers(110+valor*13,[agendado])
+            sleep(1)
+            servico.oee.linhas[valor].nome = nome
+            servico.oee.salva()
+            return logado('configurar/index.html',request,titulo='configurar DXM', msg='executado', dados=servico.oee)
+        except:
+            return logado('configurar/index.html',request,titulo='configurar DXM', msg='falha', dados=servico.oee)
 
 class Set_tickLog(View):
     def post(self,request):
