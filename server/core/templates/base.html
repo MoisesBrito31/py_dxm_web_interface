@@ -8,6 +8,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{{ titulo }}</title>
     <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    <link href="{% static 'css/toastr.css' %}" rel="stylesheet">
+
 </head>
 
 <body>
@@ -25,6 +27,9 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'oee_index' %}">Fábrica</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'config' %}">Configurar</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'sobre' %}">Sobre</a>
@@ -66,8 +71,8 @@
 
 
     <script src="{% static 'js/jQuerry 3-5-1.js' %}"></script>
-    <script src="{% static 'js/popper.js' %}"></script>
     <script src="{% static 'js/bootstrap.js' %}"></script>
+    <script src="{% static 'js/toastr.js' %}"></script>
 
     <script>
         window.onload = function () {        

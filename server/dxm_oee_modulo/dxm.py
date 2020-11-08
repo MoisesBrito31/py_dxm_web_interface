@@ -22,8 +22,6 @@ class Servico():
 
     def __init__(self, OEE:oee):
         self.oee = oee
-        self.dxm = Modbus(host=self.oee.DXM_Endress,port=502,auto_open=True)
-        self.dxm.open()
         self._setupTCP()
 
 
@@ -57,23 +55,15 @@ class Servico():
             else:
                 self.statusTcp = 'dxm OffLine'
                 self.oee.DXM_insertFalha()
-                sleep(5)
+                sleep(3)
        
     def _setupTCP(self):
         print('setupTcp...')
         self.__controleRead = False
         sleep(4)
         try:
-            """
-            try:
-                if self.dxm.is_open():
-                    self.dxm.close()
-            except:
-                pass
-            
-            self.dxm = Modbus(host=self.oee.DXM_Endress,port=502)
+            self.dxm = Modbus(host=self.oee.DXM_Endress,port=502,auto_open=True)
             self.dxm.open()
-            """
             retorno = self.dxm.read_holding_registers(0,1)
             if retorno:
                 self.statusTcp = 'dxm OnLine'
@@ -87,7 +77,7 @@ class Servico():
                 self.th.start()    
             else:
                 self.statusTcp = 'dxm OffLine'
-                sleep(5)
+                sleep(3)
                 #if not self.lendo:
                 self.__controleRead = True
                 self.th = Thread(target=self._readTCP)
@@ -95,7 +85,7 @@ class Servico():
         except Exception as ex:
             self.statusTcp = 'dxm OffLine'
             print(f'falha no setup:  {str(ex)}')
-            sleep(5)
+            sleep(3)
             #if not self.lendo:
             self.__controleRead = True
             self.th = Thread(target=self._readTCP)

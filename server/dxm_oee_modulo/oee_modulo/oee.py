@@ -333,6 +333,10 @@ class OEE():
             self.linhas = self.linhas[0:self.quantidade-num]
                
         self.quantidade = len(self.linhas)
+        index = 0
+        for l in self.linhas:
+            l.id = index
+            index+=1
 
     def flush(self):
         for x in range(len(self.linhas)):
