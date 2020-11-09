@@ -1,5 +1,5 @@
 import socket
-import datetime
+from datetime import datetime, timedelta
 from libscrc import modbus as crc_modbus
 
 
@@ -16,18 +16,17 @@ class Protocolo():
         return self._comandoSimples("CMD0112",True)
 
     def getRelogio(self):
-        ret = datetime.datetime(2000,1,1,0,0,0)
+        ret = datetime(2000,1,1,0,0,0)
         try:
             resposta = self._comandoSimples("CMD0102",True)
-            ret = datetime.datetime.strptime(resposta,'%Y-%m-%d %H:%M:%S')
-            fuso = datetime.datetime(ret.year,ret.month,ret.day,ret.hour-3,ret.minute,ret.second)          
-            return fuso
+            ret = datetime.strptime(resposta,'%Y-%m-%d %H:%M:%S')      
+            return ret - timedelta(hours=3)
         except:
             return ret
 
     def setRelogio(self):
-        now = datetime.datetime.now()
-        cmd = f'CMD0101{now.year},{now.month},{now.day},{now.hour+3},{now.minute},{now.second}'
+        now = datetime.now() + timedelta(hours=3)
+        cmd = f'CMD0101{now.year},{now.month},{now.day},{now.hour},{now.minute},{now.second}'
         ret = self._comandoSimples(cmd,False)
         if ret == 'RSP0101':
             return True

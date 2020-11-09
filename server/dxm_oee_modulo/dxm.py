@@ -3,6 +3,7 @@ from threading import Thread
 from pyModbusTCP.client import ModbusClient as Modbus
 from dxm_oee_modulo.oee_modulo.oee import OEE
 from dxm_oee_modulo.protocolo.mapa import Mapa
+from dxm_oee_modulo.protocolo.protocolo import Protocolo
 
 
 
