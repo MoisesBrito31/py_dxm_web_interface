@@ -7,10 +7,12 @@ class Protocolo():
     HEADERSIZE = 1024
     PORT = 8844
     ip = "192.168.0.100"
-    trans = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+    
 
     def __init__(self, _ip):
         self.ip = _ip
+        self.trans = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+        self.trans.connect((self.ip,self.PORT))
 
     def getMAC(self):
         return self._comandoSimples("CMD0112",True)
@@ -149,7 +151,9 @@ class Protocolo():
         ret = "falha"
         try:
             if conect:
-                self.trans.connect((self.ip,self.PORT))
+                if self.trans._closed:
+                    self.trans = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+                    self.trans.connect((self.ip,self.PORT))
             msg = bytes(cmd,"utf-8")
             self.trans.send(msg)
             resposta_bytes = self.trans.recv(self.HEADERSIZE)
@@ -167,7 +171,9 @@ class Protocolo():
 
     def _comandoSemRetorno(self,cmd):
         try:
-            self.trans.connect((self.ip,self.PORT))
+            if self.trans._closed:
+                self.trans = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+                self.trans.connect((self.ip,self.PORT))
             msg = bytes(cmd,"utf-8")
             self.trans.send(msg)
             self.trans.close() 

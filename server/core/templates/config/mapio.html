@@ -1,0 +1,247 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block context %}
+
+<style>
+    input {
+        max-width: 100px;
+        max-height:30px;
+        min-width:60px;
+    }
+    label{
+        margin-right:5px;
+    }
+</style>
+
+<div class="card-title mt-5 mb-3 pt-3">
+    <div class="row mb-5">
+        <div class="col text-left">
+            <h2>Configuração do Mapa I/O</h2>
+        </div>
+        <div class="col text-right btn-group">
+            <button type="button" class="btn btn-primary" onclick="document.location.href='/config/'">Rede</button>
+            <button type="button" class="btn btn-primary " onclick="document.location.href='/config/turno'">Turno</button>
+            <button type="button" class="btn btn-primary disabled" onclick="document.location.href='/config/mapIo'">Mapa I/O</button>
+            <button type="button" class="btn btn-primary" onclick="document.location.href='/config/DxmConfig'">Programar</button>
+            <button type="button" class="btn btn-primary  " onclick="document.location.href='/config/reset'">Destravar</button>
+        </div>
+    </div>
+    <hr>
+</div>
+
+
+
+
+<div class="container-fluid">
+    @for (int x = 0; x < Model.linhas.Count; x++)
+    {
+    <div class="p-2 m-auto" style="max-width:1000px">
+        <table class="table">
+                <thead>
+                    <tr class="bg-dark text-light">
+                        <td> @Model.linhas[x].nomeLinha</td>
+                        <td>Node:</td>
+                        <td>Input:</td>
+                        <td>ciclo(ms):</td>
+                        <td>dword:</td>
+                        <td>Usar:</td>
+                    </tr>
+
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <label>Contador de Entrada:</label>
+                        </td>
+                        <td>
+                            @{
+                                int reg1node = Model.linhas[x].regList[0].reg / 16;
+                                int reg1In = Model.linhas[x].regList[0].reg % 16;
+                            }
+                            <input id="@x conEntNode" type="number" class="form-control" min="1" max="48" value=@reg1node />
+                        </td>
+                        <td>
+                            <input id="@x conEntReg" type="number" class="form-control" min="1" max="9" value=@reg1In />
+                        </td>
+                        <td>
+                            <input id="@x conEntCiclo" type="number" class="form-control" value="@Model.linhas[x].regList[0].ciclo" />
+                        </td>
+                        <td>
+                            @if (Model.linhas[x].regList[0].dword)
+                            {
+                                <input id="@x conEntDw" type="checkbox" class="form-check" checked />
+                            }
+                            else
+                            {
+                                <input id="@x conEntDw" type="checkbox" class="form-check" />
+                            }
+
+                        </td>
+                        <td>
+                            @if (Model.linhas[x].regList[0].ativo)
+                            {
+                                <input id="@x conEntOn" type="checkbox" class="form-check" checked />
+                            }
+                            else
+                            {
+                                <input id="@x conEntOn" type="checkbox" class="form-check" />
+                            }
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label>Contador de Saída:</label>
+                        </td>
+                        <td>
+                            @{
+                                int reg2node = Model.linhas[x].regList[1].reg / 16;
+                                int reg2In = Model.linhas[x].regList[1].reg % 16;
+                            }
+                            <input id="@x conSaiNode" type="number" class="form-control" min="1" max="48" value=@reg2node />
+                        </td>
+                        <td>
+                            <input id="@x conSaiReg" type="number" class="form-control" min="1" max="9" value=@reg2In />
+                        </td>
+                        <td>
+                            <input id="@x conSaiCiclo" type="number" class="form-control" value="@Model.linhas[x].regList[1].ciclo" />
+                        </td>
+                        <td>
+                            @if (Model.linhas[x].regList[1].dword)
+                            {
+                                <input id="@x conSaiDw" type="checkbox" class="form-check" checked />
+                            }
+                            else
+                            {
+                                <input id="@x conSaiDw" type="checkbox" class="form-check" />
+                            }
+                        </td>
+                        <td>
+                            @if (Model.linhas[x].regList[1].ativo)
+                            {
+                                <input id="@x conSaiOn" type="checkbox" class="form-check" checked />
+                            }
+                            else
+                            {
+                                <input id="@x conSaiOn" type="checkbox" class="form-check" />
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label>Máquina Parada:</label>
+                        </td>
+                        <td>
+                            @{
+                                int reg3node = Model.linhas[x].regList[2].reg / 16;
+                                int reg3In = Model.linhas[x].regList[2].reg % 16;
+                            }
+                            <input id="@x stsNode" type="number" class="form-control" min="1" max="48" value=@reg3node />
+                        </td>
+                        <td>
+                            <input id="@x stsReg" type="number" class="form-control" min="1" max="9" value=@reg3In />
+                        </td>
+                        <td>
+                            <input id="@x stsCiclo" type="number" class="form-control" value="@Model.linhas[x].regList[2].ciclo" />
+                        </td>
+                        <td>
+                        </td>
+                        <td>
+                            @if (Model.linhas[x].regList[2].ativo)
+                            {
+                                <input id="@x stsOn" type="checkbox" class="form-check" checked />
+                            }
+                            else
+                            {
+                                <input id="@x stsOn" type="checkbox" class="form-check" />
+                            }
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+    </div>
+    }
+    <div class="p-2 m-auto">
+        <div class="m-auto" style="max-width:100px">
+            <button type="button" class="btn btn-block btn-success" onclick="enviar()" >Salvar</button>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+   
+      @{ 
+
+
+          string json = JsonConvert.SerializeObject(Model);
+          string temp = "";
+          /*
+          for (int x=0; x < json.Length; x++)
+          {
+              if (json.Substring(x, 1).Contains('"')) {temp = string.Format("{0}{1}",temp,'*'); }
+              else { temp = string.Format("{0}{1}",temp,json.Substring(x, 1)); }
+          }
+          json = temp;
+          */
+         
+          }
+
+        var data = @Html.Raw(json)      
+
+    function enviar() {
+
+        for (var x = 0; x < data.qndLinhas; x++) {
+            data.linhas[x].regList[0].reg =(document.getElementById(`${x} conEntReg`).value*1) + document.getElementById(`${x} conEntNode`).value * 16           
+            data.linhas[x].regList[0].ciclo = document.getElementById(`${x} conEntCiclo`).value           
+            if (document.getElementById(`${x} conEntDw`).checked) { data.linhas[x].regList[0].dword = true }
+            else { data.linhas[x].regList[0].dword = false }
+            if (document.getElementById(`${x} conEntOn`).checked) { data.linhas[x].regList[0].ativo = true }
+            else { data.linhas[x].regList[0].ativo = false }
+
+             data.linhas[x].regList[1].reg =(document.getElementById(`${x} conSaiReg`).value*1) + document.getElementById(`${x} conSaiNode`).value * 16
+            data.linhas[x].regList[1].ciclo = document.getElementById(`${x} conSaiCiclo`).value
+            if (document.getElementById(`${x} conSaiDw`).checked) { data.linhas[0].regList[1].dword = true }
+            else { data.linhas[x].regList[1].dword = false }
+            if (document.getElementById(`${x} conSaiOn`).checked) { data.linhas[x].regList[1].ativo = true }
+            else { data.linhas[x].regList[1].ativo = false }
+            
+             data.linhas[x].regList[2].reg =(document.getElementById(`${x} stsReg`).value*1) + document.getElementById(`${x} stsNode`).value * 16
+            data.linhas[x].regList[2].ciclo = document.getElementById(`${x} stsCiclo`).value
+            if (document.getElementById(`${x} stsOn`).checked) { data.linhas[x].regList[2].ativo = true }
+            else { data.linhas[x].regList[2].ativo = false }
+
+        }
+
+        //alert(JSON.stringify(data));
+
+          var xhp = new XMLHttpRequest()
+        xhp.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 200) {
+                var re = this.responseText
+                //alert(re);
+                if (re == "ok") {
+                    toastr.success("Sucesso","Dados Armazenados")
+                }
+                else {
+                    toastr.error("erro","Falha ao gravar em disco")                   
+                }
+            }
+        }
+        xhp.open("POST", "/config/setXml?json="+JSON.stringify(data));
+        xhp.send();
+    }
+
+        {% if msg == 'executado' %}
+        setTimeout( function(){
+            toastr.success("Ação executada", "Sucesso")
+        },1000)
+        {% endif %}
+        {% if msg == 'falha' %}
+        setTimeout(function(){
+            toastr.error("não foi possível executar a ação", "Falha")
+        },1000)
+        {% endif %}
+
+</script>
+
+{% endblock %}
