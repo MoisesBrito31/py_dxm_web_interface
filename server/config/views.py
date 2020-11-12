@@ -1,10 +1,11 @@
 from django.shortcuts import render, HttpResponse, HttpResponseRedirect
 from django.views.generic import View
 from core.views import logado, UserPermission
-from dxm_oee_modulo.dxm import servico, mapa, Modbus, Protocolo
+from dxm_oee_modulo.dxm import servico, Modbus, Protocolo
 from dxm_oee_modulo.protocolo.mapa import Evento
 from time import sleep
 from datetime import datetime
+import json
 
 
 class IndexView(View):
@@ -17,6 +18,18 @@ class TurnosView(View):
         dado = mapa.turnos
         return render(request,'config/turno.html',context={'dados':dado})
         #return logado('config/turno.html',request,titulo='Turnos',dados=dado,nivel_min=2)
+
+class MapIoView(View):
+    def get(self, request):
+        dado = servico.mapa.blocos
+        s = json.dumps(para_dict(dado))
+        print(s)
+        return render(request,'config/mapio.html',context={
+            'json':s,
+            'dados':dado,
+            'msg':'ok'
+        })
+        #return logado('config/mapio.html',request,context={'json':json},titulo='Mapa Io',dados=dado,nivel_min=1)
 
 class AddTurno(View):
     def post(self,request):
@@ -153,3 +166,18 @@ def online(request):
             return HttpResponse(f'{{\"dxm_online\":\"False\"}}')
     else:
         return HttpResponse('falha')
+
+def para_dict(obj):
+    # Se for um objeto, transforma num dict
+    if hasattr(obj, '__dict__'):
+        obj = obj.__dict__
+
+    # Se for um dict, lê chaves e valores; converte valores
+    if isinstance(obj, dict):
+        return { k:para_dict(v) for k,v in obj.items() }
+    # Se for uma lista ou tupla, lê elementos; também converte
+    elif isinstance(obj, list) or isinstance(obj, tuple):
+        return [para_dict(e) for e in obj]
+    # Se for qualquer outra coisa, usa sem conversão
+    else: 
+        return obj

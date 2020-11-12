@@ -33,134 +33,56 @@
 
 
 <div class="container-fluid">
-    @for (int x = 0; x < Model.linhas.Count; x++)
-    {
+    {% for l in dados %}
     <div class="p-2 m-auto" style="max-width:1000px">
         <table class="table">
                 <thead>
                     <tr class="bg-dark text-light">
-                        <td> @Model.linhas[x].nomeLinha</td>
+                        <td> {{l.nome }}</td>
                         <td>Node:</td>
                         <td>Input:</td>
                         <td>ciclo(ms):</td>
                         <td>dword:</td>
                         <td>Usar:</td>
                     </tr>
-
                 </thead>
                 <tbody>
+                    {% for r in l.regList %}
                     <tr>
                         <td>
                             <label>Contador de Entrada:</label>
                         </td>
                         <td>
-                            @{
-                                int reg1node = Model.linhas[x].regList[0].reg / 16;
-                                int reg1In = Model.linhas[x].regList[0].reg % 16;
-                            }
-                            <input id="@x conEntNode" type="number" class="form-control" min="1" max="48" value=@reg1node />
+                            <input id="{{r.id}}{{l.id}}" type="number" class="form-control" value={{r.slaveID}}  />
                         </td>
                         <td>
-                            <input id="@x conEntReg" type="number" class="form-control" min="1" max="9" value=@reg1In />
+                            <input id="{{r.id}}{{l.id}}" type="number" class="form-control" min="1" max="9" value={{r.reg}} />
                         </td>
                         <td>
-                            <input id="@x conEntCiclo" type="number" class="form-control" value="@Model.linhas[x].regList[0].ciclo" />
+                            <input id="{{r.id}}{{l.id}}" type="number" class="form-control" value="{{r.ciclo}}" />
                         </td>
                         <td>
-                            @if (Model.linhas[x].regList[0].dword)
-                            {
-                                <input id="@x conEntDw" type="checkbox" class="form-check" checked />
-                            }
-                            else
-                            {
-                                <input id="@x conEntDw" type="checkbox" class="form-check" />
-                            }
+                            {% if r.dword == '1' %}
+                                <input id="{{r.id}}{{l.id}}" type="checkbox" class="form-check" checked />
+                            {% else %}
+                                <input id="{{r.id}}{{l.id}}" type="checkbox" class="form-check" />
+                            {% endif %}
 
                         </td>
                         <td>
-                            @if (Model.linhas[x].regList[0].ativo)
-                            {
-                                <input id="@x conEntOn" type="checkbox" class="form-check" checked />
-                            }
-                            else
-                            {
-                                <input id="@x conEntOn" type="checkbox" class="form-check" />
-                            }
+                            {% if r.ativo %}
+                                <input id="{{r.id}}{{l.id}}" type="checkbox" class="form-check" checked />
+                            {% else %}
+                                <input id="{{r.id}}{{l.id}}" type="checkbox" class="form-check" />
+                            {% endif %}
 
                         </td>
                     </tr>
-                    <tr>
-                        <td>
-                            <label>Contador de Saída:</label>
-                        </td>
-                        <td>
-                            @{
-                                int reg2node = Model.linhas[x].regList[1].reg / 16;
-                                int reg2In = Model.linhas[x].regList[1].reg % 16;
-                            }
-                            <input id="@x conSaiNode" type="number" class="form-control" min="1" max="48" value=@reg2node />
-                        </td>
-                        <td>
-                            <input id="@x conSaiReg" type="number" class="form-control" min="1" max="9" value=@reg2In />
-                        </td>
-                        <td>
-                            <input id="@x conSaiCiclo" type="number" class="form-control" value="@Model.linhas[x].regList[1].ciclo" />
-                        </td>
-                        <td>
-                            @if (Model.linhas[x].regList[1].dword)
-                            {
-                                <input id="@x conSaiDw" type="checkbox" class="form-check" checked />
-                            }
-                            else
-                            {
-                                <input id="@x conSaiDw" type="checkbox" class="form-check" />
-                            }
-                        </td>
-                        <td>
-                            @if (Model.linhas[x].regList[1].ativo)
-                            {
-                                <input id="@x conSaiOn" type="checkbox" class="form-check" checked />
-                            }
-                            else
-                            {
-                                <input id="@x conSaiOn" type="checkbox" class="form-check" />
-                            }
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <label>Máquina Parada:</label>
-                        </td>
-                        <td>
-                            @{
-                                int reg3node = Model.linhas[x].regList[2].reg / 16;
-                                int reg3In = Model.linhas[x].regList[2].reg % 16;
-                            }
-                            <input id="@x stsNode" type="number" class="form-control" min="1" max="48" value=@reg3node />
-                        </td>
-                        <td>
-                            <input id="@x stsReg" type="number" class="form-control" min="1" max="9" value=@reg3In />
-                        </td>
-                        <td>
-                            <input id="@x stsCiclo" type="number" class="form-control" value="@Model.linhas[x].regList[2].ciclo" />
-                        </td>
-                        <td>
-                        </td>
-                        <td>
-                            @if (Model.linhas[x].regList[2].ativo)
-                            {
-                                <input id="@x stsOn" type="checkbox" class="form-check" checked />
-                            }
-                            else
-                            {
-                                <input id="@x stsOn" type="checkbox" class="form-check" />
-                            }
-                        </td>
-                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
     </div>
-    }
+    {% endfor %}
     <div class="p-2 m-auto">
         <div class="m-auto" style="max-width:100px">
             <button type="button" class="btn btn-block btn-success" onclick="enviar()" >Salvar</button>
@@ -169,24 +91,9 @@
 </div>
 
 <script type="text/javascript">
-   
-      @{ 
+    
 
-
-          string json = JsonConvert.SerializeObject(Model);
-          string temp = "";
-          /*
-          for (int x=0; x < json.Length; x++)
-          {
-              if (json.Substring(x, 1).Contains('"')) {temp = string.Format("{0}{1}",temp,'*'); }
-              else { temp = string.Format("{0}{1}",temp,json.Substring(x, 1)); }
-          }
-          json = temp;
-          */
-         
-          }
-
-        var data = @Html.Raw(json)      
+        var data = '{{json}}'
 
     function enviar() {
 

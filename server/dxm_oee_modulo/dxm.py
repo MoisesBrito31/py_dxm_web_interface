@@ -11,20 +11,17 @@ mapa = Mapa.carrega('store','base.mapa')
 oee = OEE.carrega('store','OEE.bin')
 
 
-
-
 class Servico():
     oee = OEE(1)
     __contProssTCP = True
     __controleRead = True
-    statusTcp = 'iniciado...'
+    statusTcp = 'dxm OffLine'
     execSetup = False
     lendo = False
 
-    def __init__(self, OEE:oee):
+    def __init__(self, OEE:oee, Mapa:mapa):
         self.oee = oee
-        self._setupTCP()
-
+        self.mapa = mapa
 
     def ler(self):
         try:
@@ -33,6 +30,7 @@ class Servico():
             if linha:
                 if linha > 0:
                     self.oee.alteraLinhas(linha)
+                    self.mapa.alteraQtdEquip(linha)
                 self.oee.emulador = self.dxm.read_holding_registers(88,1)[0]
                 for x in range(len(self.oee.linhas)):
                     self.oee.linhas[x].insert_dinamics(self.dxm.read_holding_registers(0+x*5,5))
@@ -97,11 +95,10 @@ class Servico():
         self.__controleRead = False 
         self.dxm.close()
 
-servico = Servico(oee)
-
-
+servico = Servico(oee,mapa)
 
 def leitu():
+    servico._setupTCP()
     controle = True
     while controle:
         cmd = input()
