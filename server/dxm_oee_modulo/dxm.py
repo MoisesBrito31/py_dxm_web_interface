@@ -30,7 +30,9 @@ class Servico():
             if linha:
                 if linha > 0:
                     self.oee.alteraLinhas(linha)
-                    self.mapa.alteraQtdEquip(linha)
+                    if self.mapa.alteraQtdEquip(linha):
+                        for x in range(len(self.oee.linhas)):
+                            self.mapa.blocos[x].nome = self.oee.linhas[x].nome
                 self.oee.emulador = self.dxm.read_holding_registers(88,1)[0]
                 for x in range(len(self.oee.linhas)):
                     self.oee.linhas[x].insert_dinamics(self.dxm.read_holding_registers(0+x*5,5))
@@ -95,6 +97,8 @@ class Servico():
         self.__controleRead = False 
         self.dxm.close()
 
+
+sleep(2)
 servico = Servico(oee,mapa)
 
 def leitu():

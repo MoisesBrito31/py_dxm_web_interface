@@ -23,8 +23,6 @@ class MapIoView(View):
     def get(self, request):
         dado = servico.mapa.blocos
         s = json.dumps(para_dict(dado))
-        #s = s.replace('&quot;','\"')
-        print(s)
         return render(request,'config/mapio.html',context={
             'json':s,
             'dados':dado,

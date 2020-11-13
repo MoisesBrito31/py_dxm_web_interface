@@ -46,10 +46,12 @@ class Evento():
         return f'<event end=\"{endH}:{endM}:{endS}\" name=\"{self.nome}\" reg=\"{str(self.regControle)}\" start=\"{startH}:{startM}:{startS}\" on=\"{str(self.on)}\" exclude=\"{str(self.exclude)}\" days=\"{self.days}\" off=\"{str(self.off)}\" />'
 
 class Bloco():
+    id = 0
     nome = "sem nome"
     regList = []
 
     def __init__(self,nome,regList):
+        self.id = 0
         self.nome= nome
         self.regList = regList
 
@@ -116,39 +118,39 @@ class Mapa():
 
     def alteraQtdEquip(self,num:int):
         if num > self.qntEquip:
-            regs =[]
-            a = Reg(17)
-            for x in range(3):
-                regs.append(a)
+            regs=[
+                Reg(17,nome='contador de entrada',id=0),
+                Reg(18,nome='contador de saída',id=1),
+                Reg(19,nome='máquina parada',id=2),
+            ]
             for x in range(num-self.qntEquip):
-                b = Bloco(f'equipamento {x}',regs)
+                b = Bloco(f'equipamento {self.qntEquip+x}',regs)
                 self.blocos.append(b)
             self.qntEquip = len(self.blocos)
+            for x in range(len(self.blocos)):
+                self.blocos[x].id = x
             self.salva()
             return True
         if num < self.qntEquip:
             self.blocos = self.blocos[:num]
             self.qntEquip = len(self.blocos)
+            for x in range(len(self.blocos)):
+                self.blocos[x].id = x
             self.salva()
             return True
         return False
 
-    def alteraNomeEquip(self,nomes:list):
-        for x in range(len(nomes)):
-            self.blocos[x].nome = nomes[x]
-
     def _criarArquivo(self):
-        blocos = []
-        turnos = []
-        e = Evento('Turno 1',datetime(2000,1,1,0,0,0))
-        r = Reg(17)
-        r1 = Reg(18)
-        r2 = Reg(19)
-        b = Bloco('Equipamento 1',[r,r1,r2])
-        blocos.append(b)
-        turnos.append(e)
-        self.blocos = blocos
-        self.turnos = turnos
+        self.blocos = [
+            Bloco('Equipamento 1',[
+                Reg(17,nome='contador de entrada',id=0),
+                Reg(18,nome='contador de saída',id=1),
+                Reg(19,nome='máquina parada',id=2),
+            ]),
+        ]
+        self.turnos = [
+            Evento('Turno 1',datetime(2000,1,1,0,0,0)),
+        ]
         self.qntEquip = 1
         self.salva()
 
