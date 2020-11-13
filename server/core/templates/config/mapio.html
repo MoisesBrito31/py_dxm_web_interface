@@ -93,7 +93,10 @@
 <script type="text/javascript">
     
 
-        var data = '{{json}}'
+        var js = '{{json}}'
+        js = js.replace(/&quot;/gi,'\"')
+    alert(js)
+        var data = JSON.parse(js)
 
     function enviar() {
 

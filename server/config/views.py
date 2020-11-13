@@ -15,7 +15,7 @@ class IndexView(View):
 
 class TurnosView(View):
     def get(self,request):
-        dado = mapa.turnos
+        dado = servico.mapa.turnos
         return render(request,'config/turno.html',context={'dados':dado})
         #return logado('config/turno.html',request,titulo='Turnos',dados=dado,nivel_min=2)
 
@@ -23,6 +23,7 @@ class MapIoView(View):
     def get(self, request):
         dado = servico.mapa.blocos
         s = json.dumps(para_dict(dado))
+        #s = s.replace('&quot;','\"')
         print(s)
         return render(request,'config/mapio.html',context={
             'json':s,
@@ -41,22 +42,22 @@ class AddTurno(View):
             nome = str(request.POST['nome'])
             index = int(request.POST['index'])
             e = Evento(nome,time,id=index)
-            mapa.turnos.append(e)
-            #mapa.salva()
-            return logado('config/turno.html',request,titulo='Turnos', msg='executado', dados=mapa.turnos)
+            servico.mapa.turnos.append(e)
+            #servico.mapa.salva()
+            return logado('config/turno.html',request,titulo='Turnos', msg='executado', dados=servico.mapa.turnos)
         except:
-            return logado('config/turno.html',request,titulo='Turnos', msg='falha', dados=mapa.turnos)
+            return logado('config/turno.html',request,titulo='Turnos', msg='falha', dados=servico.mapa.turnos)
 
 class DeleteTurno(View):
     def post(self,request,value):
         try:
-            mapa.turnos.remove(mapa.turnos[value])
-            for x in range(len(mapa.turnos)):
-                mapa.turnos[x].id = x
-            #mapa.salva()
-            return logado('config/turno.html',request,titulo='Turnos', msg='executado', dados=mapa.turnos)
+            servico.mapa.turnos.remove(servico.mapa.turnos[value])
+            for x in range(len(servico.mapa.turnos)):
+                servico.mapa.turnos[x].id = x
+            #servico.mapa.salva()
+            return logado('config/turno.html',request,titulo='Turnos', msg='executado', dados=servico.mapa.turnos)
         except:
-            return logado('config/turno.html',request,titulo='Turnos', msg='falha', dados=mapa.turnos)
+            return logado('config/turno.html',request,titulo='Turnos', msg='falha', dados=servico.mapa.turnos)
 
 class EditTurno(View):
     def post(self,request,value):
@@ -66,12 +67,12 @@ class EditTurno(View):
             m = int(recb[1])
             time = datetime(1,1,1,h,m,0)
             nome = str(request.POST['nome'])
-            mapa.turnos[value].nome = nome
-            mapa.turnos[value].start = time
-            #mapa.salva()
-            return logado('config/turno.html',request,titulo='Turnos', msg='executado', dados=mapa.turnos)
+            servico.mapa.turnos[value].nome = nome
+            servico.mapa.turnos[value].start = time
+            #servico.mapa.salva()
+            return logado('config/turno.html',request,titulo='Turnos', msg='executado', dados=servico.mapa.turnos)
         except:
-            return logado('config/turno.html',request,titulo='Turnos', msg='falha', dados=mapa.turnos)
+            return logado('config/turno.html',request,titulo='Turnos', msg='falha', dados=servico.mapa.turnos)
 
 def getRelogio(request):
     if UserPermission(request,nivel_min=1):
