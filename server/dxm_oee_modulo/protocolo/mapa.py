@@ -81,14 +81,16 @@ class Mapa():
     turnos:Evento = []
     qntEquip:int = 0
     arquivo = ""
+    modo = 0
 
-    def __init__(self, nome='base', nomeArquivo='base.mapa',pasta="",blocos=[],turnos=[],qntEquip=0, inicia=False):
+    def __init__(self, nome='base', nomeArquivo='base.mapa',pasta="",blocos=[],turnos=[],qntEquip=0, inicia=False, modo=0):
         self.pasta = pasta
         self.nome = nome
         self.nomeArquivo = nomeArquivo
         self.blocos =blocos
         self.turnos = turnos
         self.qntEquip = qntEquip
+        self.modo = modo
         if inicia:
             self._criarArquivo()
 

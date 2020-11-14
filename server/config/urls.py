@@ -1,13 +1,14 @@
 from django.urls import path
 from .views import online, IndexView, TurnosView, MapIoView
 from .views import Set_ip, Set_linhas, Set_tickLog, emula, zerarLinha, Set_dados
-from .views import AddTurno, DeleteTurno, EditTurno
+from .views import AddTurno, DeleteTurno, EditTurno, MapAltModo
 from .views import getRelogio, setRelogio
 
 urlpatterns = [
     path('', IndexView.as_view(), name='config'),
     path('turno', TurnosView.as_view(), name='turno'),
     path('mapio', MapIoView.as_view(), name='map_io'),
+    path('mapaltmodo', MapAltModo.as_view(), name='map_alt_modo'),
     path('addTurno', AddTurno.as_view(), name='add_turno'),
     path('deletaTurno/<int:value>', DeleteTurno.as_view(), name='deleta_turno'),
     path('editTurno/<int:value>', EditTurno.as_view(), name='edit_turno'),

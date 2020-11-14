@@ -1,4 +1,4 @@
-from django.shortcuts import render, HttpResponse, HttpResponseRedirect
+from django.shortcuts import render, HttpResponse, redirect
 from django.views.generic import View
 from core.views import logado, UserPermission
 from dxm_oee_modulo.dxm import servico, Modbus, Protocolo
@@ -24,11 +24,18 @@ class MapIoView(View):
         dado = servico.mapa.blocos
         s = json.dumps(para_dict(dado))
         return render(request,'config/mapio.html',context={
+            'modo':servico.mapa.modo,
             'json':s,
             'dados':dado,
             'msg':'ok'
         })
-        #return logado('config/mapio.html',request,context={'json':json},titulo='Mapa Io',dados=dado,nivel_min=1)
+        #return logado('config/mapio.html',request,context={'json':json,'modo':servico.mapa.modo},titulo='Mapa Io',dados=dado,nivel_min=1)
+
+class MapAltModo(View):
+    def post(self,request):
+        m = int(request.POST['modo'])
+        servico.mapa.modo = m
+        return redirect('/config/mapio')
 
 class AddTurno(View):
     def post(self,request):
@@ -99,7 +106,7 @@ class Set_ip(View):
         servico.close()
         servico._setupTCP()
         sleep(3)
-        return HttpResponseRedirect('/config')
+        return redirect('/config')
 
 class Set_linhas(View):
     def post(self,request):
@@ -108,7 +115,7 @@ class Set_linhas(View):
             servico.dxm.write_multiple_registers(89,[valor])
             sleep(2)
         sleep(3)
-        return HttpResponseRedirect('/config')
+        return redirect('/config')
 
 class Set_dados(View):
     def post(self,request,valor):
@@ -139,7 +146,7 @@ class Set_tickLog(View):
         print(valor)
         servico.oee.tickLog = valor
         sleep(3)
-        return HttpResponseRedirect('/config')
+        return redirect('/config')
 
 def emula(request,valor):
     if UserPermission(request,nivel_min=1):

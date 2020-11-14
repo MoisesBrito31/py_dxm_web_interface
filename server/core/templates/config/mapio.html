@@ -27,6 +27,20 @@
         </div>
     </div>
     <hr>
+    <div>
+        <form action="{% url 'map_alt_modo' %}" method="POST" id="modo_form">
+            {% csrf_token %}
+        <select id="modo" name="modo" class="form-control m-auto text-center" style="max-width: 300px;" onchange="modoAlt()">
+        {% if modo == 0 %}
+            <option value="0" selected>SureCross</option>
+            <option value="1">Multi-Hop</option>
+        {% else %}
+            <option value="0" >SureCross</option>
+            <option value="1" selected>Multi-Hop</option>
+        {% endif %}
+        </select>
+        </form>
+    </div>
 </div>
 
 
@@ -39,8 +53,13 @@
                 <thead>
                     <tr class="bg-dark text-light">
                         <td> {{l.nome }}</td>
+                    {% if modo == 0 %}
                         <td>Node:</td>
                         <td>Input:</td>
+                    {% else %}
+                        <td>ID:</td>
+                        <td>Reg (40x):</td>
+                    {% endif %}
                         <td>ciclo(ms):</td>
                         <td>dword:</td>
                         <td>Usar:</td>
@@ -50,7 +69,7 @@
                     {% for r in l.regList %}
                     <tr>
                         <td>
-                            <label>{{r.nome}}:</label>
+                            <label>Contador de Entrada:</label>
                         </td>
                         <td>
                             <input id="{{r.id}}{{l.id}}" type="number" class="form-control" value={{r.slaveID}}  />
@@ -95,7 +114,6 @@
 
         var js = '{{json}}'
         js = js.replace(/&quot;/gi,'\"')
-    alert(js)
         var data = JSON.parse(js)
 
     function enviar() {
@@ -139,6 +157,10 @@
         }
         xhp.open("POST", "/config/setXml?json="+JSON.stringify(data));
         xhp.send();
+    }
+
+    function modoAlt(){
+        document.getElementById('modo_form').submit()
     }
 
         {% if msg == 'executado' %}
