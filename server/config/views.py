@@ -18,20 +18,16 @@ class IndexView(View):
 class TurnosView(View):
     def get(self,request):
         dado = servico.mapa.turnos
-        return render(request,'config/turno.html',context={'dados':dado})
-        #return logado('config/turno.html',request,titulo='Turnos',dados=dado,nivel_min=2)
+        return logado('config/turno.html',request,titulo='Turnos',dados=dado,nivel_min=2)
 
 class MapIoView(View):
     def get(self, request):
         dado = servico.mapa.blocos
         s = json.dumps(para_dict(dado))
-        return render(request,'config/mapio.html',context={
-            'modo':servico.mapa.modo,
-            'json':s,
-            'dados':dado,
-            'msg':'ok'
-        })
-        #return logado('config/mapio.html',request,context={'json':json,'modo':servico.mapa.modo},titulo='Mapa Io',dados=dado,nivel_min=1)
+        return logado('config/mapio.html',request,context={
+                'json':s,
+                'modo':servico.mapa.modo
+            },titulo='Mapa Io',dados=dado,nivel_min=1)
     def post(self,request):
         try:
             ret = request.POST['json']
@@ -47,28 +43,25 @@ class MapIoView(View):
             scr.salvaArquivo()
             dado = servico.mapa.blocos
             s = json.dumps(para_dict(dado))
-            return render(request,'config/mapio.html',context={
-                'modo':servico.mapa.modo,
+            return logado('config/mapio.html',request,context={
                 'json':s,
-                'dados':dado,
-                'msg':'executado'
-            })
+                'modo':servico.mapa.modo
+            },titulo='Mapa Io',dados=dado,nivel_min=1,msg='executado')
         except Exception as ex:
-             return render(request,'config/mapio.html',context={
-                'modo':servico.mapa.modo,
+            return logado('config/mapio.html',request,context={
                 'json':s,
-                'dados':dado,
-                'msg':'falha'
-            })
-        
+                'modo':servico.mapa.modo
+            },titulo='Mapa Io',dados=dado,nivel_min=1,msg='falha')
+
+class DxmConfigView(View):
+    def get(self,request):
+        return logado('config/dxmconfig.html',request,titulo='Programar DXM')
 
 class MapAltModo(View):
     def post(self,request):
         m = int(request.POST['modo'])
         servico.mapa.modo = m
         return redirect('/config/mapio')
-
-
 
 class AddTurno(View):
     def post(self,request):
@@ -111,26 +104,6 @@ class EditTurno(View):
             return logado('config/turno.html',request,titulo='Turnos', msg='executado', dados=servico.mapa.turnos)
         except:
             return logado('config/turno.html',request,titulo='Turnos', msg='falha', dados=servico.mapa.turnos)
-
-def getRelogio(request):
-    if UserPermission(request,nivel_min=1):
-        dxm = Protocolo(servico.oee.DXM_Endress)
-        ret = dxm.getRelogio()
-        return HttpResponse(f'{ret.day}/{ret.month}/{ret.year}  {ret.hour}:{ret.minute}:{ret.second}')
-    else:
-        return HttpResponse('falha')
-
-def setRelogio(request):
-    if UserPermission(request,nivel_min=1):
-        dxm = Protocolo(servico.oee.DXM_Endress)
-        ret = dxm.setRelogio()
-        if ret == True:
-            return HttpResponse('ok')
-        else:
-            return HttpResponse('falha')
-    else:
-        return HttpResponse('falha')
-
 
 class Set_ip(View):
     def post(self,request):
@@ -228,3 +201,94 @@ def para_dict(obj):
     # Se for qualquer outra coisa, usa sem conversão
     else: 
         return obj
+
+
+def getRelogio(request):
+    if UserPermission(request,nivel_min=1):
+        dxm = Protocolo(servico.oee.DXM_Endress)
+        ret = dxm.getRelogio()
+        return HttpResponse(f'{ret.day}/{ret.month}/{ret.year}  {ret.hour}:{ret.minute}:{ret.second}')
+    else:
+        return HttpResponse('falha')
+
+def setRelogio(request):
+    if UserPermission(request,nivel_min=1):
+        dxm = Protocolo(servico.oee.DXM_Endress)
+        ret = dxm.setRelogio()
+        if ret == True:
+            return HttpResponse('ok')
+        else:
+            return HttpResponse('falha')
+    else:
+        return HttpResponse('falha')
+
+def travar(request):
+    if UserPermission(request,nivel_min=1):
+        dxm = Protocolo(servico.oee.DXM_Endress)
+        if dxm.travar():
+            return HttpResponse('ok')
+        else:
+            return HttpResponse('falha')
+    else:
+        return HttpResponse('falha')
+
+def destravar(request):
+    if UserPermission(request,nivel_min=1):
+        dxm = Protocolo(servico.oee.DXM_Endress)
+        if dxm.destravar():
+            return HttpResponse('ok')
+        else:
+            return HttpResponse('falha')
+    else:
+        return HttpResponse('falha')
+
+def sendScript(request):
+    if UserPermission(request,nivel_min=1):
+        dxm = Protocolo(servico.oee.DXM_Endress)
+        if dxm.enviaArquivo('OEE.sb','store'):
+            return HttpResponse('ok')
+        else:
+            return HttpResponse('falha')
+    else:
+        return HttpResponse('falha')
+
+def sendXml(request):
+    if UserPermission(request,nivel_min=1):
+        dxm = Protocolo(servico.oee.DXM_Endress)
+        if dxm.enviaArquivo('DXM_OEE.xml','store'):
+            return HttpResponse('ok')
+        else:
+            return HttpResponse('falha')
+    else:
+        return HttpResponse('falha')
+
+def fileExist(request,file):
+    if UserPermission(request,nivel_min=1):
+        dxm = Protocolo(servico.oee.DXM_Endress)
+        if dxm.fileExist(file):
+            return HttpResponse('ok')
+        else:
+            return HttpResponse('falha')
+    else:
+        return HttpResponse('falha')
+
+def fileDelete(request,file):
+    if UserPermission(request,nivel_min=1):
+        dxm = Protocolo(servico.oee.DXM_Endress)
+        if dxm.deleteFile(file):
+            return HttpResponse('ok')
+        else:
+            return HttpResponse('falha')
+    else:
+        return HttpResponse('falha')
+
+def fileDownload(request,file:str):
+    if UserPermission(request,nivel_min=1):
+        dxm = Protocolo(servico.oee.DXM_Endress)
+        tipo = str(file.split('.')[1])
+        arquiv = dxm.getFile(file)
+        response = HttpResponse(arquiv,content_type=f'text/{tipo}')
+        response['Content-Disposition'] = f'attachment; filename="{file}"'
+        return response
+    else:
+        return HttpResponse('falha')

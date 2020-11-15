@@ -1,0 +1,214 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block context %}
+
+<style>
+    input {
+        max-width: 180px;
+    }
+</style>
+
+<div class="card-title mt-5 mb-3 pt-3">
+    <div class="row mb-5">
+        <div class="col text-left">
+            <h2>Configuração do DXM</h2>
+        </div>
+        <div class="col text-right btn-group">
+            <button type="button" class="btn btn-primary" onclick="document.location.href='/config/index'">Rede</button>
+            <button type="button" class="btn btn-primary " onclick="document.location.href='/config/turno'">Turno</button>
+            <button type="button" class="btn btn-primary " onclick="document.location.href='/config/mapio'">Mapa I/O</button>
+            <button type="button" class="btn btn-primary disabled" onclick="document.location.href='/config/dxmconfig'">Programar</button>
+            <button type="button" class="btn btn-primary" onclick="document.location.href='/config/reset'">Destravar</button>
+        </div>
+    </div>
+    <hr>
+
+</div>
+
+
+<div class="container-fluid">
+    <div class="m-auto" style="max-width:600px">
+        <h2 class="text-center">Calibração do DXM</h2>
+        <p>O processo que se segue ira carregar o xml e o script para que o dxm realize cálculo de OEE <br />
+        Atenção! Durante o processo não desligue ou desconecte o DXM da rede</p>
+    </div>
+    <div class="m-auto pt-4 pb-4" style="max-width:200px">
+        <button id="butInicia" class="btn btn-block btn-success" type="button" onclick="iniciar()">
+            <span id="splint" class="spinner-border spinner-border-sm" style="visibility:collapse"></span>
+            <span id="butInfo">Iniciar</span>
+        </button>
+        
+    </div>
+    <div class="progress m-auto" style="height:40px; max-width:600px">
+        <div id="progress" class="progress-bar progress-bar-striped progress-bar-animated bg-success" style="width:0%;"></div>
+    </div>
+</div>
+
+
+
+<script type="text/javascript">
+    var barra = document.getElementById("progress");
+    var butInicia = document.getElementById("butInicia");
+    var infoInicia = document.getElementById("butInfo");
+    var roda = document.getElementById("splint");
+    var percent = 0;
+
+    function iniciar() {
+        percent = 0;
+        infoInicia.innerHTML = "Em processo";
+        roda.setAttribute("style", "visibility:visible");
+        barUpdate();
+        destravar();
+    }
+    function barUpdate() {
+         percent += 20;
+        barra.setAttribute("style", `width:${percent}%`);
+    }
+    function fim() {
+        toastr.success("DXM calibrado", "Sucesso");
+        infoInicia.innerHTML = "Reiniciando DXM, Aguarde...";
+        //roda.setAttribute("style", "visibility:collapse");
+        barra.setAttribute("style", `width:100%`);
+        setTimeout(function () {
+            document.location.href = "/config";
+        }, 5000);
+    }
+    function falha() {       
+        infoInicia.innerHTML = "Reiniciar";
+        roda.setAttribute("style", "visibility:collapse");
+        barra.setAttribute("style", `width:0%`);
+    }
+    function travado() {
+        var xhp = new XMLHttpRequest()
+        xhp.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 200) {
+                var re = this.responseText
+                //alert(re);
+                if (re == "travado") {
+                    barUpdate();
+                    destravar();
+                }
+                else {
+                    baixaLog();                    
+                }
+            }
+        }
+        xhp.open("Get", "/Config/getEstado");
+        xhp.send();
+    }
+    function destravar() {
+          var xhp = new XMLHttpRequest()
+        xhp.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 200) {
+                var re = this.responseText
+                //alert(re);
+                if (re == "ok") {
+                    barUpdate();
+                    enviarSB();                   
+                }
+                else {
+                    toastr.error("erro","Falha ao destravar DXM")
+                    falha();
+                }
+            }
+        }
+        xhp.open("Get", "/config/destravar");
+        xhp.send();
+    }
+     function baixaLog() {
+          var xhp = new XMLHttpRequest()
+        xhp.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 200) {
+                var re = this.responseText
+                //alert(re);
+                if (re == "ok") {
+                    enviarSB();                
+                }
+                else {
+                    //toastr.error(re,"erro")
+                    enviarSB();  
+                }
+            }
+        }
+        xhp.open("Get", "/Config/baixaLog");
+        xhp.send();
+    }
+     function travar() {
+          var xhp = new XMLHttpRequest()
+        xhp.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 200) {
+                var re = this.responseText
+                //alert(re);
+                if (re == "ok") {
+                    barUpdate();
+                    fim();
+                }
+                else {
+                    toastr.error("Falha critica do processo, tente novamente","Falha erro")
+                    falha();
+                }
+            }
+        }
+        xhp.open("Get", "/config/travar");
+        xhp.send();
+    }
+    function enviarSB() {
+          var xhp = new XMLHttpRequest()
+        xhp.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 200) {
+                var re = this.responseText
+                //alert(re);
+                if (re == "ok") {
+                    barUpdate();
+                    enviarXml();
+                }
+                else {
+                    toastr.error("Falha ao tentar envia o Script","Erro")
+                     falha();
+                }
+            }
+        }
+        xhp.open("Get", "/config/sendscript");
+        xhp.send();
+    }
+    function validaSB() {
+          var xhp = new XMLHttpRequest()
+        xhp.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 200) {
+                var re = this.responseText
+                //alert(re);
+                if (re == "ok") {
+                    barUpdate();
+                    enviarXml();
+                }
+                else {
+                    toastr.error("arquivo de Script enviado porem inexistente na memoria do DXM","Erro")
+                     falha();
+                }
+            }
+        }
+        xhp.open("Get", "/Config/exist?file=OEE.sb");
+        xhp.send();
+    }
+    function enviarXml() {
+          var xhp = new XMLHttpRequest()
+        xhp.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 200) {
+                var re = this.responseText
+                //alert(re);
+                if (re == "ok") {
+                    barUpdate();
+                    setTimeout(travar,2000);
+                }
+                else {
+                    toastr.error("Falha ao tentar envia o XML","Erro")
+                    travar();
+                }
+            }
+        }
+        xhp.open("Get", "/config/sendxml");
+        xhp.send();
+    }
+</script>
+
+{% endblock %}

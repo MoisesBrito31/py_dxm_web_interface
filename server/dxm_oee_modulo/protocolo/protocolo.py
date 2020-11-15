@@ -1,7 +1,7 @@
 import socket
 from datetime import datetime, timedelta
 from libscrc import modbus as crc_modbus
-
+from time import sleep
 
 class Protocolo():
     HEADERSIZE = 1024
@@ -100,7 +100,6 @@ class Protocolo():
         msg = self._comandoSimples("CMD1003",False,close=False)
         if msg != "RSP1003":
             return ret
-
         msg = self._comandoSimples(f"CMD1001/{nome},0,0,1",False,close=False,conect=False)
         if msg[:7] != "RSP1001":
             return ret
@@ -111,6 +110,7 @@ class Protocolo():
             msg = self._comandoSimples(f"CMD1002{index}",False,close=False,conect=False)           
             if msg != "RSP10020,ffff,EOF":
                 valor = self._tratamentoString(msg)
+                print(valor)
                 if valor > 0:
                     ret.append(self._stringTrocaQuebraL(msg[valor:]))
                     index+=1
@@ -125,6 +125,7 @@ class Protocolo():
     def enviaArquivo(self,nome,pasta):
         #out = open("output.txt",'w')
         colecao = self._estruturaArquivo(nome,pasta)
+        print(colecao)
         msg = self._comandoSimples("CMD1003",False,close=False)
         if msg != "RSP1003":
             return False
@@ -211,8 +212,9 @@ class Protocolo():
 
     def _estruturaArquivo(self,nome,pasta):
         colecao = []
-        arquivo = open(pasta+nome,'r')
+        arquivo = open(f'{pasta}\{nome}','r')
         dados = self._stringTrocaQuebraL(arquivo.read(),decode=False)
+        arquivo.close()
         tamanho = len(dados)
         loops = int(tamanho/512)
         resto = int(tamanho%512)
@@ -240,5 +242,9 @@ class Protocolo():
         b = bytes(dados,'ASCII')
         valor= str(hex(crc_modbus(b))).upper()[2:]
         hi = valor[2:]
+        if len(hi)<2:
+            hi = f'0{hi}'
         lo = valor[:2]
+        if lo<2:
+            lo=f'0{lo}'
         return hi+lo
