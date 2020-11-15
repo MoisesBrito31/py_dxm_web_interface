@@ -1,4 +1,4 @@
-from protocolo.mapa import Mapa
+#from .mapa import Mapa
 
 class Xml():
     pasta = ""
@@ -7,7 +7,7 @@ class Xml():
     mapa = ""
     buffer = ""
 
-    def __init__(self, mapa:Mapa, pasta="", nomeArquivo="DXM_OEE.xml", nome="base" ):
+    def __init__(self, mapa, pasta="", nomeArquivo="DXM_OEE.xml", nome="base" ):
         self.mapa = mapa
         if self.mapa:
             print('mapa ok')
@@ -18,14 +18,14 @@ class Xml():
         self._carregaXml()
 
     def _carregaXml(self):
-        file = open(f'{self.pasta}{self.nomeArquivo}','r')
+        file = open(f'{self.pasta}\{self.nomeArquivo}','r')
         self.arquivo = file.read()
         file.close()
 
     def salvaArquivo(self):
         self._compilaArquivo()
         #ar = open(f'{self.pasta}{self.nomeArquivo}','w')
-        ar = open(f'{self.pasta}teste.xml','w')
+        ar = open(f'{self.pasta}\{self.nomeArquivo}','w')
         ar.write(self.buffer)
         ar.close()
 

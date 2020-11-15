@@ -1,15 +1,15 @@
-from protocolo.mapa import Mapa
-from .oee import Linha
+#from protocolo.mapa import Mapa
+#from .oee import Linha
 
 class Script:
-    def __init__(self):
-        self.pasta = ''
-        self.nomeArquivo = 'OEE.sb'
-        self.arquivo = f'{self.pasta}{self.nomeArquivo}'
+    def __init__(self, linhas, mapa, log, pasta='store', nomeArquivo='OEE.sb'):
+        self.pasta = pasta
+        self.nomeArquivo = nomeArquivo
+        self.arquivo = f'{self.pasta}\{self.nomeArquivo}'
         self.buffer = []
-        self.linhas = []
-        self.mapa:Mapa
-        self.log = 60
+        self.linhas = linhas
+        self.mapa = mapa
+        self.log = log
         self.carregaArquivo()
     
     def carregaArquivo(self):
@@ -19,6 +19,7 @@ class Script:
             arqui.close()
             return True
         except:
+            print('Falha ao carregar o arquivo OEE.sb')
             return False
 
     def salvaArquivo(self):
@@ -29,6 +30,7 @@ class Script:
             arq.close()
             return True
         except:
+            print('falha ao salvar o arquivo OEE.sb')
             return False
 
     def copilaBuffer(self):
@@ -43,9 +45,11 @@ class Script:
             ret = f'{ret}forma[{x}]={self.linhas[x].forma}\r'
             ret = f'{ret}t_p_prog[{x}]={self.linhas[x].t_p_prog}\r'
             try:
-                ret = f'{ret}NODE[{x}]={int(self.Mapa.blocos[x].regList[0].reg/16)}\r'
+                ret = f'{ret}NODE[{x}]={int(self.mapa.blocos[x].regList[0].reg/16)}\r'
             except:
                 pass
+        ret = f'{ret}trig_log={self.log}\r'
+        return ret
     def subBufferFim(self):
-        index = self.arquivo.find("'inicio")
-        return self.arquivo[index:]
+        index = self.buffer.find("'inicio")
+        return self.buffer[index:]

@@ -3,6 +3,7 @@ from django.views.generic import View
 from core.views import logado, UserPermission
 from dxm_oee_modulo.dxm import servico, Modbus, Protocolo
 from dxm_oee_modulo.protocolo.mapa import Evento
+from dxm_oee_modulo.oee_modulo.script import Script
 from time import sleep
 from datetime import datetime
 import json
@@ -41,6 +42,9 @@ class MapIoView(View):
                     servico.mapa.blocos[x].regList[y].reg = dic[x]['regList'][y]['reg']
                     servico.mapa.blocos[x].regList[y].dword = dic[x]['regList'][y]['dword']
                     servico.mapa.blocos[x].regList[y].ativo = dic[x]['regList'][y]['ativo']
+            servico.mapa.salva()
+            scr = Script(servico.oee.linhas,servico.mapa,servico.oee.tickLog)
+            scr.salvaArquivo()
             dado = servico.mapa.blocos
             s = json.dumps(para_dict(dado))
             return render(request,'config/mapio.html',context={
@@ -77,7 +81,7 @@ class AddTurno(View):
             index = int(request.POST['index'])
             e = Evento(nome,time,id=index)
             servico.mapa.turnos.append(e)
-            #servico.mapa.salva()
+            servico.mapa.salva()
             return logado('config/turno.html',request,titulo='Turnos', msg='executado', dados=servico.mapa.turnos)
         except:
             return logado('config/turno.html',request,titulo='Turnos', msg='falha', dados=servico.mapa.turnos)
@@ -88,7 +92,7 @@ class DeleteTurno(View):
             servico.mapa.turnos.remove(servico.mapa.turnos[value])
             for x in range(len(servico.mapa.turnos)):
                 servico.mapa.turnos[x].id = x
-            #servico.mapa.salva()
+            servico.mapa.salva()
             return logado('config/turno.html',request,titulo='Turnos', msg='executado', dados=servico.mapa.turnos)
         except:
             return logado('config/turno.html',request,titulo='Turnos', msg='falha', dados=servico.mapa.turnos)
@@ -103,7 +107,7 @@ class EditTurno(View):
             nome = str(request.POST['nome'])
             servico.mapa.turnos[value].nome = nome
             servico.mapa.turnos[value].start = time
-            #servico.mapa.salva()
+            servico.mapa.salva()
             return logado('config/turno.html',request,titulo='Turnos', msg='executado', dados=servico.mapa.turnos)
         except:
             return logado('config/turno.html',request,titulo='Turnos', msg='falha', dados=servico.mapa.turnos)
@@ -144,6 +148,8 @@ class Set_linhas(View):
             servico.dxm.write_multiple_registers(89,[valor])
             sleep(2)
         sleep(3)
+        scr = Script(servico.oee.linhas,servico.mapa,servico.oee.tickLog)
+        scr.salvaArquivo()
         return redirect('/config')
 
 class Set_dados(View):
@@ -167,6 +173,7 @@ class Set_dados(View):
             for x in range(len(servico.oee.linhas)):
                 servico.mapa.blocos[x].nome = servico.oee.linhas[x].nome
             servico.oee.salva()
+            servico.mapa.salva()
             return logado('config/index.html',request,titulo='configurar DXM', msg='executado', dados=servico.oee)
         except:
             return logado('config/index.html',request,titulo='configurar DXM', msg='falha', dados=servico.oee)
@@ -174,9 +181,12 @@ class Set_dados(View):
 class Set_tickLog(View):
     def post(self,request):
         valor = int(request.POST['valor'])
-        print(valor)
         servico.oee.tickLog = valor
+        servico.oee.salva()
         sleep(3)
+        print(len(servico.oee.linhas))
+        scr = Script(servico.oee.linhas,servico.mapa,valor)
+        scr.salvaArquivo()
         return redirect('/config')
 
 def emula(request,valor):

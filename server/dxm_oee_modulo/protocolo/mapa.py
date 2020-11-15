@@ -1,6 +1,7 @@
 from datetime import datetime
 import pickle
 import os
+from .xml import Xml
 
 class Evento():
     id = 0
@@ -8,17 +9,17 @@ class Evento():
     nome = 'sem nome'
     regControle = 91
     start = datetime.now()
-    on = 0
+    on = 1
     off = 0
     exclude = 0
     days = "SMTWHFR"
 
-    def __init__(self,nome:str,start:datetime,id=0,regControle=91,on=0,off=0,exclude=0,days="SMTWHFR"):
+    def __init__(self,nome:str,start:datetime,id=0,regControle=91,on=1,off=0,exclude=0,days="SMTWHFR"):
         self.id = id
         self.nome = nome
         self.regControle = regControle
         self.start = start
-        self.end = datetime(start.year,start.month,start.day,start.hour,start.minute+1,start.second)
+        self.end = datetime(start.year,start.month,start.day,start.hour,start.minute,start.second+1)
         self.on = on
         self.off = off
         self.exclude = exclude
@@ -114,7 +115,8 @@ class Mapa():
             arquivo = open(f'{self.pasta}\{self.nomeArquivo}','wb')
             pickle.dump(self,arquivo)
             arquivo.close()
-
+            xml = Xml(self,pasta='store')
+            xml.salvaArquivo()
         except Exception as e:
             print(f'falha ao salvar mapa{str(e)}')
 
