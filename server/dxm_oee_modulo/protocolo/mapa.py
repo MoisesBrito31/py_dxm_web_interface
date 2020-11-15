@@ -129,17 +129,28 @@ class Mapa():
                 b = Bloco(f'equipamento {self.qntEquip+x}',regs)
                 self.blocos.append(b)
             self.qntEquip = len(self.blocos)
-            for x in range(len(self.blocos)):
-                self.blocos[x].id = x
+            try:
+                for x in range(len(self.blocos)):
+                    self.blocos[x].id = x
+            except:
+                pass
             self.salva()
             return True
         if num < self.qntEquip:
             self.blocos = self.blocos[:num]
             self.qntEquip = len(self.blocos)
-            for x in range(len(self.blocos)):
-                self.blocos[x].id = x
+            try:
+                for x in range(len(self.blocos)):
+                    self.blocos[x].id = x
+            except:
+                pass
             self.salva()
             return True
+        try:
+            for x in range(len(self.blocos)):
+                self.blocos[x].id = x
+        except:
+            pass
         return False
 
     def _criarArquivo(self):

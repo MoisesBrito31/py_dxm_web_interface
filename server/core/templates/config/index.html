@@ -11,7 +11,7 @@
         <div class="col text-right  btn-group">
             <button type="button" class="btn btn-primary disabled" onclick="#">Rede</button>
             <button type="button" class="btn btn-primary " onclick="document.location.href='/config/turno'">Turno</button>
-            <button type="button" class="btn btn-primary" onclick="document.location.href='/config/mapIO'">Mapa I/O</button>
+            <button type="button" class="btn btn-primary" onclick="document.location.href='/config/mapio'">Mapa I/O</button>
             <button type="button" class="btn btn-primary" onclick="document.location.href='/config/DxmConfig'">Programar</button>
             <button type="button" class="btn btn-primary" onclick="document.location.href='/config/reset'">Destravar</button>
             <!--
@@ -99,7 +99,7 @@
                 </div>
                 <div class="col-auto mt-3">
                     <p>ação:</p>
-                    <button class="btn btn-primary" type="submit">Salvar </button>
+                    <button id="{{l.id}}salva" class="btn btn-primary" type="submit" onclick="salva({{l.id}})" >Salvar </button>
                     <button class="btn btn-danger" type="button" onclick="zera({{l.id}})">Zerar</button>
                 </div>
             
@@ -139,14 +139,18 @@
         document.getElementById("bAltLog").innerHTML = "<span class=\"spinner-border spinner-border-sm mr-1\"></span>Alterando...";
     }
 
+    function salva(valor){
+        document.getElementById(`${valor}salva`).innerHTML ="<span class=\"spinner-border spinner-border-sm mr-1\"></span>Alterando...";
+    }
+
     function zera(valor) {
         var xhp = new XMLHttpRequest()
 
         xhp.onreadystatechange = function () {
             if (this.readyState === 4 && this.status === 200) {
                 var re = this.responseText
-                if (re == "ok") { toastr.success("contadores Zerados", "Sucesso") }
-                else { toastr.error("não foi possível zerar Contadores", "Falha") }
+                if (re == "ok") { toastr.success("contador Zerados", "Sucesso") }
+                else { toastr.error("não foi possível zerar Contador", "Falha") }
             }
         }
         xhp.open("Get", `/config/zerar_linha/${valor}`);
@@ -155,34 +159,9 @@
 
     function linhaAltera() {
         document.getElementById("splint2").innerHTML = "<span class=\"spinner-border spinner-border-sm mr-1\"></span>Alterando...";
-       
     }
    
-    function emula(valor) {
-
-        if (valor == 0) {
-            valor = 1
-        }
-        else {
-            valor = 0
-        }
-
-        var xhp = new XMLHttpRequest()
-        xhp.onreadystatechange = function () {
-            if (this.readyState === 4 && this.status === 200) {
-                var re = this.responseText
-                if (re == 'ok'){
-                    setTimeout(document.location.reload(), 2000)
-                }
-                else{
-                    alert('você não possui permissão')
-                }
-            }
-        }
-        xhp.open("Get", "/config/emula/" + valor);
-        xhp.send();
-    }
-
+   
     
         {% for l in dados.linhas %}
             timers.push({{l.t_p_prog}})
@@ -203,12 +182,12 @@
         {% if msg == 'executado' %}
         setTimeout( function(){
             toastr.success("Ação executada", "Sucesso")
-        },1000)
+        },100)
         {% endif %}
         {% if msg == 'falha' %}
         setTimeout(function(){
             toastr.error("não foi possível executar a ação", "Falha")
-        },1000)
+        },100)
         {% endif %}
 
 </script>

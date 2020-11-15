@@ -21,7 +21,7 @@
         <div class="col text-right btn-group">
             <button type="button" class="btn btn-primary" onclick="document.location.href='/config/'">Rede</button>
             <button type="button" class="btn btn-primary " onclick="document.location.href='/config/turno'">Turno</button>
-            <button type="button" class="btn btn-primary disabled" onclick="document.location.href='/config/mapIo'">Mapa I/O</button>
+            <button type="button" class="btn btn-primary disabled" onclick="document.location.href='/config/mapio'">Mapa I/O</button>
             <button type="button" class="btn btn-primary" onclick="document.location.href='/config/DxmConfig'">Programar</button>
             <button type="button" class="btn btn-primary  " onclick="document.location.href='/config/reset'">Destravar</button>
         </div>
@@ -69,30 +69,30 @@
                     {% for r in l.regList %}
                     <tr>
                         <td>
-                            <label>Contador de Entrada:</label>
+                            <label>{{r.nome}}:</label>
                         </td>
                         <td>
-                            <input id="{{r.id}}{{l.id}}" type="number" class="form-control" value={{r.slaveID}}  />
+                            <input id="{{l.id}}{{r.id}}slID" type="number" class="form-control" />
                         </td>
                         <td>
-                            <input id="{{r.id}}{{l.id}}" type="number" class="form-control" min="1" max="9" value={{r.reg}} />
+                            <input id="{{l.id}}{{r.id}}reg" type="number" class="form-control" />
                         </td>
                         <td>
-                            <input id="{{r.id}}{{l.id}}" type="number" class="form-control" value="{{r.ciclo}}" />
+                            <input id="{{l.id}}{{r.id}}ciclo" type="number" class="form-control" value="{{r.ciclo}}" />
                         </td>
                         <td>
-                            {% if r.dword == '1' %}
-                                <input id="{{r.id}}{{l.id}}" type="checkbox" class="form-check" checked />
+                            {% if r.dword == '2' %}
+                                <input {% if r.id == 2 %}disabled{% endif %}  id="{{l.id}}{{r.id}}dword" type="checkbox" class="form-check" checked />
                             {% else %}
-                                <input id="{{r.id}}{{l.id}}" type="checkbox" class="form-check" />
+                                <input {% if r.id == 2 %}disabled{% endif %}  id="{{l.id}}{{r.id}}dword" type="checkbox" class="form-check" />
                             {% endif %}
 
                         </td>
                         <td>
                             {% if r.ativo %}
-                                <input id="{{r.id}}{{l.id}}" type="checkbox" class="form-check" checked />
+                                <input id="{{l.id}}{{r.id}}ativo" type="checkbox" class="form-check" checked />
                             {% else %}
-                                <input id="{{r.id}}{{l.id}}" type="checkbox" class="form-check" />
+                                <input id="{{l.id}}{{r.id}}ativo" type="checkbox" class="form-check" />
                             {% endif %}
 
                         </td>
@@ -103,6 +103,10 @@
     </div>
     {% endfor %}
     <div class="p-2 m-auto">
+        <form action="{% url 'map_io' %}" method="POST" id="form_json">
+            {% csrf_token %}
+            <input type="hidden" name="json" id="id_json">
+        </form>
         <div class="m-auto" style="max-width:100px">
             <button type="button" class="btn btn-block btn-success" onclick="enviar()" >Salvar</button>
         </div>
@@ -115,63 +119,70 @@
         var js = '{{json}}'
         js = js.replace(/&quot;/gi,'\"')
         var data = JSON.parse(js)
+        var modo = '{{modo}}'
 
     function enviar() {
-
-        for (var x = 0; x < data.qndLinhas; x++) {
-            data.linhas[x].regList[0].reg =(document.getElementById(`${x} conEntReg`).value*1) + document.getElementById(`${x} conEntNode`).value * 16           
-            data.linhas[x].regList[0].ciclo = document.getElementById(`${x} conEntCiclo`).value           
-            if (document.getElementById(`${x} conEntDw`).checked) { data.linhas[x].regList[0].dword = true }
-            else { data.linhas[x].regList[0].dword = false }
-            if (document.getElementById(`${x} conEntOn`).checked) { data.linhas[x].regList[0].ativo = true }
-            else { data.linhas[x].regList[0].ativo = false }
-
-             data.linhas[x].regList[1].reg =(document.getElementById(`${x} conSaiReg`).value*1) + document.getElementById(`${x} conSaiNode`).value * 16
-            data.linhas[x].regList[1].ciclo = document.getElementById(`${x} conSaiCiclo`).value
-            if (document.getElementById(`${x} conSaiDw`).checked) { data.linhas[0].regList[1].dword = true }
-            else { data.linhas[x].regList[1].dword = false }
-            if (document.getElementById(`${x} conSaiOn`).checked) { data.linhas[x].regList[1].ativo = true }
-            else { data.linhas[x].regList[1].ativo = false }
-            
-             data.linhas[x].regList[2].reg =(document.getElementById(`${x} stsReg`).value*1) + document.getElementById(`${x} stsNode`).value * 16
-            data.linhas[x].regList[2].ciclo = document.getElementById(`${x} stsCiclo`).value
-            if (document.getElementById(`${x} stsOn`).checked) { data.linhas[x].regList[2].ativo = true }
-            else { data.linhas[x].regList[2].ativo = false }
-
-        }
-
-        //alert(JSON.stringify(data));
-
-          var xhp = new XMLHttpRequest()
-        xhp.onreadystatechange = function () {
-            if (this.readyState === 4 && this.status === 200) {
-                var re = this.responseText
-                //alert(re);
-                if (re == "ok") {
-                    toastr.success("Sucesso","Dados Armazenados")
+        for (x =0 ; x<data.length ; x++ ){
+            for (y=0;y<3;y++){
+                if(modo == '0'){
+                    data[x].regList[y].slaveID = 1
+                    var ms = document.getElementById(`${x}${y}slID`).value*1
+                    var ls = document.getElementById(`${x}${y}reg`).value*1
+                    data[x].regList[y].reg = (ms*16)+ls
                 }
-                else {
-                    toastr.error("erro","Falha ao gravar em disco")                   
+                else{
+                    var ms = document.getElementById(`${x}${y}slID`).value*1
+                    var ls = document.getElementById(`${x}${y}reg`).value*1
+                    data[x].regList[y].slaveID = 1*ms
+                    data[x].regList[y].reg = 1*ls
                 }
+                var cic = document.getElementById(`${x}${y}ciclo`).value
+                data[x].regList[y].ciclo = cic*1
+                if (document.getElementById(`${x}${y}dword`).checked) { data[x].regList[y].dword = '2' }
+                else { data[x].regList[y].dword = '1' }
+                if (document.getElementById(`${x}${y}ativo`).checked) { data[x].regList[y].ativo = true }
+                else { data[x].regList[y].ativo = false }
             }
         }
-        xhp.open("POST", "/config/setXml?json="+JSON.stringify(data));
-        xhp.send();
+
+        document.getElementById('id_json').value = JSON.stringify(data)
+        document.getElementById('form_json').submit()
     }
 
     function modoAlt(){
         document.getElementById('modo_form').submit()
     }
 
+    function loadinfo(){
+        for (x =0 ; x<data.length ; x++ ){
+            for (y=0;y<3;y++){
+                if(modo == '0'){
+                    document.getElementById(`${x}${y}slID`).value = Math.floor(data[x].regList[y].reg/16)
+                    document.getElementById(`${x}${y}reg`).value = data[x].regList[y].reg%16
+                    data[x].regList[y].slaveID = 1
+                }
+                else{
+                    document.getElementById(`${x}${y}slID`).value = data[x].regList[y].slaveID
+                    document.getElementById(`${x}${y}reg`).value = data[x].regList[y].reg
+                }
+            }
+            
+        }
+    }
+
+    
+     loadinfo()
+    
+
         {% if msg == 'executado' %}
         setTimeout( function(){
             toastr.success("Ação executada", "Sucesso")
-        },1000)
+        },100)
         {% endif %}
         {% if msg == 'falha' %}
         setTimeout(function(){
             toastr.error("não foi possível executar a ação", "Falha")
-        },1000)
+        },100)
         {% endif %}
 
 </script>

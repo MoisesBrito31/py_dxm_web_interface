@@ -6,6 +6,7 @@ from dxm_oee_modulo.protocolo.mapa import Evento
 from time import sleep
 from datetime import datetime
 import json
+from collections import namedtuple
 
 
 class IndexView(View):
@@ -30,12 +31,40 @@ class MapIoView(View):
             'msg':'ok'
         })
         #return logado('config/mapio.html',request,context={'json':json,'modo':servico.mapa.modo},titulo='Mapa Io',dados=dado,nivel_min=1)
+    def post(self,request):
+        try:
+            ret = request.POST['json']
+            dic = json.loads(ret)
+            for x in range(len(servico.mapa.blocos)):
+                for y in range(len(servico.mapa.blocos[x].regList)):
+                    servico.mapa.blocos[x].regList[y].slaveID = dic[x]['regList'][y]['slaveID']
+                    servico.mapa.blocos[x].regList[y].reg = dic[x]['regList'][y]['reg']
+                    servico.mapa.blocos[x].regList[y].dword = dic[x]['regList'][y]['dword']
+                    servico.mapa.blocos[x].regList[y].ativo = dic[x]['regList'][y]['ativo']
+            dado = servico.mapa.blocos
+            s = json.dumps(para_dict(dado))
+            return render(request,'config/mapio.html',context={
+                'modo':servico.mapa.modo,
+                'json':s,
+                'dados':dado,
+                'msg':'executado'
+            })
+        except Exception as ex:
+             return render(request,'config/mapio.html',context={
+                'modo':servico.mapa.modo,
+                'json':s,
+                'dados':dado,
+                'msg':'falha'
+            })
+        
 
 class MapAltModo(View):
     def post(self,request):
         m = int(request.POST['modo'])
         servico.mapa.modo = m
         return redirect('/config/mapio')
+
+
 
 class AddTurno(View):
     def post(self,request):
@@ -135,6 +164,8 @@ class Set_dados(View):
             servico.dxm.write_multiple_registers(110+valor*13,[agendado])
             sleep(1)
             servico.oee.linhas[valor].nome = nome
+            for x in range(len(servico.oee.linhas)):
+                servico.mapa.blocos[x].nome = servico.oee.linhas[x].nome
             servico.oee.salva()
             return logado('config/index.html',request,titulo='configurar DXM', msg='executado', dados=servico.oee)
         except:
