@@ -78,7 +78,6 @@ class Protocolo():
         cmd = f'CMD0002 {start},{len(dados)},{slaveID},{modbus},{timeout}'
         for x in dados:
             cmd = f'{cmd},{x}'
-        print(cmd)
         msg = self._comandoSimples(cmd,False, close=close, conect=open)
         if msg == 'RSP0002':
             return True
@@ -110,7 +109,6 @@ class Protocolo():
             msg = self._comandoSimples(f"CMD1002{index}",False,close=False,conect=False)           
             if msg != "RSP10020,ffff,EOF":
                 valor = self._tratamentoString(msg)
-                print(valor)
                 if valor > 0:
                     ret.append(self._stringTrocaQuebraL(msg[valor:]))
                     index+=1
@@ -125,7 +123,6 @@ class Protocolo():
     def enviaArquivo(self,nome,pasta):
         #out = open("output.txt",'w')
         colecao = self._estruturaArquivo(nome,pasta)
-        print(colecao)
         msg = self._comandoSimples("CMD1003",False,close=False)
         if msg != "RSP1003":
             return False
@@ -241,10 +238,8 @@ class Protocolo():
     def _crc16(self,dados):
         b = bytes(dados,'ASCII')
         valor= str(hex(crc_modbus(b))).upper()[2:]
+        while len(valor)<4:
+            valor=f'0{valor}'
         hi = valor[2:]
-        if len(hi)<2:
-            hi = f'0{hi}'
         lo = valor[:2]
-        if lo<2:
-            lo=f'0{lo}'
         return hi+lo

@@ -26,8 +26,16 @@
  
  
  
-  <rtu_read> </rtu_read><rtu_write>
-</rtu_write> <sched_holidays /> <sched_commands /> <sched_events><event end="00:00:01" name="Turno 1" reg="91" start="00:00:00" on="1" exclude="0" days="SMTWHFR" off="0" /><event end="06:00:01" name="Turno 2" reg="91" start="06:00:00" on="1" exclude="0" days="SMTWHFR" off="0" /><event end="18:00:01" name="Turno 3" reg="91" start="18:00:00" on="1" exclude="0" days="SMTWHFR" off="0" /> </sched_events>
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  <rtu_read>    <rule count="2" mask="0" name="contagem_entrada" offset="0" poll="1.0" remfmt="int" remreg="33" remtype="hold_reg" scale="0" swapped="0" unit="1" localreg="1" maxfail="0" default="0" />   <rule count="1" mask="0" name="contagem_saida" offset="0" poll="1.0" remfmt="int" remreg="34" remtype="hold_reg" scale="0" swapped="0" unit="1" localreg="4" maxfail="0" default="0" />   <rule count="1" mask="0" name="maquina_parada" offset="0" poll="1.0" remfmt="int" remreg="35" remtype="hold_reg" scale="0" swapped="0" unit="1" localreg="5" maxfail="0" default="0" /></rtu_read><rtu_write>
+</rtu_write> <sched_holidays /> <sched_commands /> <sched_events><event end="00:00:01" name="Turno 1" reg="91" start="00:00:00" on="1" exclude="0" days="SMTWHFR" off="0" /><event end="04:00:01" name="Turno 2" reg="91" start="04:00:00" on="1" exclude="0" days="SMTWHFR" off="0" /><event end="17:30:01" name="Turno 3" reg="91" start="17:30:00" on="1" exclude="0" days="SMTWHFR" off="0" /> </sched_events>
   <astro_clock>
     <set dst="0" lat="0" lon="0" zone="-3" />
   </astro_clock>
