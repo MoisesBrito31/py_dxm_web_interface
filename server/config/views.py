@@ -292,3 +292,24 @@ def fileDownload(request,file:str):
         return response
     else:
         return HttpResponse('falha')
+
+def baixaLog(request):
+    if UserPermission(request, nivel_min=1):
+        dxm = Protocolo(servico.oee.DXM_Endress)
+        if servico.statusTcp.find('OnLine')>=0:
+            dxm.destravar()
+            arqui = dxm.getFile('sbfile1.dat')
+            dados = ''
+            for x in arqui:
+               dados=f'{dados}{x}'
+               dados.replace('\r',',')
+            out = open('sbfile1.dat','w')
+            out.write(dados)
+            out.close()
+            dxm.travar()
+            return HttpResponse('ok')
+        else:
+            return HttpResponse('falha')
+        return HttpResponse('falha')
+    else:
+        return HttpResponse('falha')

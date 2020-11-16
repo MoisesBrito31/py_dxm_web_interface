@@ -4,6 +4,7 @@ from .views import Set_ip, Set_linhas, Set_tickLog, emula, zerarLinha, Set_dados
 from .views import AddTurno, DeleteTurno, EditTurno, MapAltModo
 from .views import getRelogio, setRelogio
 from .views import destravar, travar, sendXml, sendScript, fileExist, fileDelete, fileDownload
+from .views import baixaLog
 
 urlpatterns = [
     path('', IndexView.as_view(), name='config'),
@@ -29,5 +30,6 @@ urlpatterns = [
     path('fileexist/<str:file>',fileExist, name='file_exist'),
     path('filedelete/<str:file>',fileDelete, name='file_delete'),
     path('fileget/<str:file>',fileDownload, name='file_get'),
+    path('baixalog', baixaLog, name='baixa_log'),
     path('online', online, name='online'),
 ]
