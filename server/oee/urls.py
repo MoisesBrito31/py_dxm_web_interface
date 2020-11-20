@@ -1,10 +1,11 @@
 from django.urls import path
-from .views import IndexView, LinhaView
+from .views import IndexView, LinhaView, HistoricoView
 from .views import conjunto_linhas, get_linha, set_vel_esp, set_forma,set_t_p_prog
 
 urlpatterns = [
     path('', IndexView.as_view(), name='oee_index'),
     path('linha/<int:id>',LinhaView.as_view(), name='linha'),
+    path('historico/<int:valor>',HistoricoView.as_view(), name='historico'),
     path('conjunto_linhas', conjunto_linhas, name='conjunto_linhas'),
     path('set_vel_esp/<int:index>/<int:valor>', set_vel_esp, name='set_vel_esp'),
     path('set_forma/<int:index>/<int:valor>', set_forma, name='set_forma'),

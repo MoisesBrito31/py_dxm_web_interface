@@ -1,6 +1,7 @@
 from django.shortcuts import render, HttpResponse, redirect
 from django.views.generic import View
 from core.views import logado, UserPermission
+from oee.models import Hist
 from dxm_oee_modulo.dxm import servico, Modbus, Protocolo
 from dxm_oee_modulo.protocolo.mapa import Evento
 from dxm_oee_modulo.oee_modulo.script import Script
@@ -304,29 +305,38 @@ def baixaLog(request):
     if UserPermission(request, nivel_min=1):
         dxm = Protocolo(servico.oee.DXM_Endress)
         if servico.statusTcp.find('OnLine')>=0:
-            dxm.destravar()
-            arqui = dxm.getFile('sbfile1.dat')
-            dados = ''
-            for x in arqui:
-               dados=f'{dados}{x}'
-            dados = dados.replace('\n',',')
-            dados = '[' + dados + ']'
-            dados = dados.replace('\t','')
-            dados = dados.replace('\'','')
-            dados = dados.replace('\n','')
-            dados = dados.replace(',}','}')
-            dados = dados.replace(',]',']')
-            j = json.loads(dados)
-            banco=[]
-            for x in j:
-                banco.append(dict_to_obj(x))
-            dxm.travar()
-            for x in banco:
-                for y in range(len(servico.oee.linhas)):
-                    if x.id == servico.oee.linhas[y].id:
-                        servico.oee.linhas[y].historico.append(x)
-            servico.oee.salva()               
-            return HttpResponse('ok')
+            try:
+                dxm.destravar()
+                arqui = dxm.getFile('sbfile1.dat')
+                dados = ''
+                for x in arqui:
+                    dados=f'{dados}{x}'
+                dados = dados.replace('\n',',')
+                dados = '[' + dados + ']'
+                dados = dados.replace('\t','')
+                dados = dados.replace(':,',':0,')
+                dados = dados.replace('\'','')
+                dados = dados.replace('\n','')
+                dados = dados.replace(',}','}')
+                dados = dados.replace(',]',']')
+                arm = open(f'store\\download\\file.dat','w')
+                arm.write( dados.replace(',{',',\n{'))
+                arm.close()
+                j = json.loads(dados)
+                banco=[]
+                for x in j:
+                    banco.append(dict_to_obj(x))
+                for x in banco:
+                    H = Hist(linha=x.id,time=datetime.strptime(x.time,'%Y-%m-%d %H:%M:%S'),
+                    oee=x.oee,dis=x.dis,q=x.q,per=x.per,vel_atu=x.vel_atu,bons=x.bons,
+                    ruins_total=x.ruins_total,t_par=x.t_par,t_prod=x.t_prod)                    
+                    H.save()
+                    print(f'salvei o historico {H.id}')
+                dxm.deleteFile('sbfile1.dat')  
+                dxm.travar()         
+                return HttpResponse('ok')
+            except Exception as ex:
+                return HttpResponse(f'falha - {str(ex)}')
         else:
             return HttpResponse('falha')
         return HttpResponse('falha')

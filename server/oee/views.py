@@ -1,7 +1,10 @@
 from django.shortcuts import render, HttpResponse
 from django.views.generic import View
 from core.views import logado, UserPermission
+from oee.models import Hist
+from django.db.models import Q
 from dxm_oee_modulo.dxm import Servico, servico, Modbus
+from datetime import datetime, timedelta
 
 class IndexView(View):
     def get(self,request):
@@ -14,6 +17,31 @@ class LinhaView(View):
         print(id)
         l = servico.oee.linhas[id]
         return logado('oee/linha.html',request,dados=l,titulo=l.nome, nivel_min=3)
+
+class HistoricoView(View):
+    def get(self, request, valor):
+        ago = datetime.now()
+        ini = datetime(ago.year,ago.month,ago.day,0,0,0,0)
+        inis = f'{ago.year}-{ago.month}-{ago.day}T00:00:00'
+        fim = datetime(ago.year,ago.month,ago.day,23,59,0,0)
+        fims = f'{ago.year}-{ago.month}-{ago.day}T23:59:00'
+        dado = Hist.objects.filter(Q(linha__exact=valor),Q(time__gte=ini),Q(time__lte=fim))
+        dadof = Hist.objects.filter(Q(linha__exact=valor),Q(time__gte=ini),Q(time__lte=fim))
+        for h in dado:            
+            h.time = f'{h.time.hour}:{h.time.minute} {h.time.day}/{h.time.month}/{h.time.year}'
+        for hf in dadof:
+            hf.time = f'{hf.time.hour}:{hf.time.minute} {hf.time.day}/{hf.time.month}/{hf.time.year}'
+            hf.t_par = f'{str(int(hf.t_par/60))}:{str(hf.t_par%60)}'
+            hf.t_prod = f'{str(int(hf.t_prod/60))}:{str(hf.t_prod%60)}'
+        return render(request,'oee/historico.html',context={
+            'titulo':'historico',
+            'linha_id':valor,
+            'linha_nome':servico.oee.linhas[valor].nome,
+            'dados':dado,
+            'dadosf':dadof,
+            'ini': inis,
+            'fim': fims
+        })
 
 def get_linha(request,id):
     if UserPermission(request, 3):

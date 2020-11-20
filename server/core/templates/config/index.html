@@ -161,7 +161,24 @@
         document.getElementById("splint2").innerHTML = "<span class=\"spinner-border spinner-border-sm mr-1\"></span>Alterando...";
     }
    
-   
+    function emula(valor) {
+        if (valor == 0) {
+            valor = 1
+        }
+        else {
+            valor = 0
+        }
+
+        var xhp = new XMLHttpRequest()
+        xhp.onreadystatechange = function () {
+        if (this.readyState === 4 && this.status === 200) {
+            var re = this.responseText
+            setTimeout(document.location.reload(), 2000)
+        }
+        }
+        xhp.open("Get", "/config/emula/" + valor);
+        xhp.send();
+    }
     
         {% for l in dados.linhas %}
             timers.push({{l.t_p_prog}})

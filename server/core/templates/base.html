@@ -46,12 +46,10 @@
             <strong class="text-light">[&nbsp; <a href="{% url 'logout' %}">Sair</a>&nbsp; ] </strong>
             {% endif %}
             {% endif %}
-            {% if titulo != 'historico' %}
             <div class="navbar-nav ml-auto pr-3">
                 <button onclick="getLog()" type="button" class="btn btn-light p-1 mr-2" style="max-height:40px;max-width:40px;"><img src="{% static 'img/sync.png' %}" width="20" height="20" /></button>
                 <img id="sts" src="{% static 'img/notifiEspera.ico' %}" width="30" height="30" />
             </div>
-            {% endif %}
         </div>
     </nav>
 
@@ -78,6 +76,24 @@
         window.onload = function () {        
         getStatus();
         setInterval(getStatus, 5000);
+    }
+
+    function getLog(){
+        var xhp = new XMLHttpRequest()
+        xhp.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 200) {
+                var re = this.responseText
+                if (re == 'ok') {
+                    toastr.success("Ação executada", "Sucesso")
+                }
+                else {
+                    toastr.error(re, "Falha")
+                }
+               
+            }
+        }
+        xhp.open("Get", "{% url 'baixa_log' %}");
+        xhp.send();
     }
 
     function getStatus() {
