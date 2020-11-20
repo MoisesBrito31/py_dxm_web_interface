@@ -1,19 +1,44 @@
 <?xml version="1.0" encoding="us-ascii"?>
 <configuration>
   <file_info>
-    <info filename="dx700.xml" guid="80448f7f-f4bf-4073-ba64-06e01893ec09" software="DXMConfigurationSoftware v4" timestamp="17/11/2020 14:39:45" version="4.8.4.0" os="Win32NT" osversion="Microsoft Windows NT 6.1.7601 Service Pack 1" device="DXM700" solution="None" />
+    <info filename="DXM_OEE.xml" guid="3d76c934-f901-402b-a16f-535e70c124c4" software="DXMConfigurationSoftware v4" timestamp="16/05/2020 18:48:09" version="4.8.4.0" os="Win32NT" osversion="Microsoft Windows NT 6.2.9200.0" device="DXM100" solution="None" />
   </file_info>
-  <local_regs />
+  <local_regs>
+  </local_regs>
   <cascade />
   <constant />
   <calculate />
   <thresholds />
   <trend />
   
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
   <rtu_read> </rtu_read><rtu_write>
 </rtu_write> <sched_holidays /> <sched_commands /> <sched_events><event end="00:00:01" name="Turno 1" reg="91" start="00:00:00" on="1" exclude="0" days="SMTWHFR" off="0" /><event end="04:00:01" name="Turno 2" reg="91" start="04:00:00" on="1" exclude="0" days="SMTWHFR" off="0" /><event end="17:30:01" name="Turno 3" reg="91" start="17:30:00" on="1" exclude="0" days="SMTWHFR" off="0" /> </sched_events>
   <astro_clock>
-    <set dst="0" lat="0" lon="0" zone="0" />
+    <set dst="0" lat="0" lon="0" zone="-3" />
   </astro_clock>
   <gps>
     <unit addr="0" enabled="0" flags="0" lograte="00:00:00" poll="00:00:00" />
@@ -23,7 +48,6 @@
   </master_mode>
   <rtu_device>
     <dev baud="19200" commtype="485" data="8" parity="0" stop="1" rate="50" thisUnit="0" timeout="5.000" />
-    <bus baud="19200" commtype="4" data="8" parity="0" stop="1" rate="50" thisUnit="255" timeout="5.000" />
   </rtu_device>
   <rtu_server>
     <dev baud="19200" commtype="485" data="8" parity="0" stop="1" timeout="0" />
@@ -44,7 +68,7 @@
     </fileinfo>
     <fileinfo>
       <message></message>
-      <log dir="1" enab="0" end="00:00:00" name="LogFile1.txt" new="0" rate="00:00:00" reg="0" tod="5" full="0" size="102400" email="" subject="" />
+      <log dir="1" enab="0" end="00:00:00" name="LogFile1.txt" new="0" rate="00:00:00" reg="0" tod="1" full="0" size="102400" email="" subject="" />
     </fileinfo>
     <fileinfo>
       <message></message>
@@ -150,8 +174,8 @@
     </sms_recipient>
   </sms>
   <server_params>
-    <server apn="IP" apnpass="vzwinternet" cellenab="8" cellfw="0.0.0.0" cellfwmask="255.255.255.0" defaddr="0.0.0.0" defgtwy="0.0.0.0" defmask="255.255.255.0" dhcp="1" sms="0" />
-    <cell_info cell_modelname="SXI-LTE-001" />
+    <server apn="IP" apnpass="" cellenab="8" cellfw="0.0.0.0" cellfwmask="255.255.255.0" defaddr="0.0.0.0" defgtwy="0.0.0.0" defmask="255.255.255.0" dhcp="1" sms="0" />
+    <cell_info cell_modelname="SXI-CATM1VZW-001" />
     <maint csqbak="0" cexch="0" csqret="5" csrvwd="0" linkdel="60000" linkret="2" csflags="0" csrvre="0" ckeep="0" linkmax="120000" />
     <eth flags="0" />
     <apn idx="1" type="IPV4V6" name="" />
@@ -164,7 +188,7 @@
   <http_push>
     <dns address="0.0.0.0" />
     <dns address="0.0.0.0" />
-    <push enabled="1" flags="4104" id="00000000-0000-0000-0000-000000000000" interval="00:00:00" port="80" debug="0" vendor="0" host="push.bannercds.com" page="/push.aspx" />
+    <push enabled="1" flags="4096" id="00000000-0000-0000-0000-000000000000" interval="00:00:00" port="80" debug="0" vendor="0" host="push.bannercds.com" page="/push.aspx" />
   </http_push>
   <fwall />
   <profinet>

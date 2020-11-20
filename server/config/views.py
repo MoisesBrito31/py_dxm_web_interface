@@ -202,6 +202,13 @@ def para_dict(obj):
     else: 
         return obj
 
+class dict_to_obj(object):
+    def __init__(self, d):
+        for a, b in d.items():
+            if isinstance(b, (list, tuple)):
+               setattr(self, a, [obj(x) if isinstance(x, dict) else x for x in b])
+            else:
+               setattr(self, a, obj(b) if isinstance(b, dict) else b)
 
 def getRelogio(request):
     if UserPermission(request,nivel_min=1):
@@ -302,11 +309,23 @@ def baixaLog(request):
             dados = ''
             for x in arqui:
                dados=f'{dados}{x}'
-               dados.replace('\r',',')
-            out = open('sbfile1.dat','w')
-            out.write(dados)
-            out.close()
+            dados = dados.replace('\n',',')
+            dados = '[' + dados + ']'
+            dados = dados.replace('\t','')
+            dados = dados.replace('\'','')
+            dados = dados.replace('\n','')
+            dados = dados.replace(',}','}')
+            dados = dados.replace(',]',']')
+            j = json.loads(dados)
+            banco=[]
+            for x in j:
+                banco.append(dict_to_obj(x))
             dxm.travar()
+            for x in banco:
+                for y in range(len(servico.oee.linhas)):
+                    if x.id == servico.oee.linhas[y].id:
+                        servico.oee.linhas[y].historico.append(x)
+            servico.oee.salva()               
             return HttpResponse('ok')
         else:
             return HttpResponse('falha')
