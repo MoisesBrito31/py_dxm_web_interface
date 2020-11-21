@@ -8,6 +8,7 @@ from .views import baixaLog
 
 urlpatterns = [
     path('', IndexView.as_view(), name='config'),
+    path('index', IndexView.as_view(), name='config_index'),
     path('turno', TurnosView.as_view(), name='turno'),
     path('mapio', MapIoView.as_view(), name='map_io'),
     path('dxmconfig', DxmConfigView.as_view(), name='dxm_config'),

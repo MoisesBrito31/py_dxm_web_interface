@@ -10,6 +10,7 @@ urlpatterns = [
     path('erro', ErroView.as_view(), name='erro'),
     path('index', IndexView.as_view(), name='index'),
     path('sobre', SobreView.as_view(), name='sobre'),
+    path('about', SobreView.as_view(), name='about'),
     path('login/', LoginView.as_view(), name='login'),
     path('logout', Logout.as_view(), name='logout'),
     path('usuario', UsuarioView.as_view(), name='usuario'),

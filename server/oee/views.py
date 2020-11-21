@@ -39,15 +39,14 @@ class HistoricoView(View):
             hf.time = f'{hora}:{hf.time.minute} {hf.time.day}/{hf.time.month}/{hf.time.year}'
             hf.t_par = f'{str(int(hf.t_par/60))}:{str(hf.t_par%60)}'
             hf.t_prod = f'{str(int(hf.t_prod/60))}:{str(hf.t_prod%60)}'
-        return render(request,'oee/historico.html',context={
-            'titulo':f'historico {servico.oee.linhas[valor].nome}',
-            'linha_id':valor,
-            'linha_nome':servico.oee.linhas[valor].nome,
-            'dados':dado,
-            'dadosf':dadof,
-            'ini': inis,
-            'fim': fims
-        })
+        return logado('oee/historico.html',request,titulo=f'historico {servico.oee.linhas[valor].nome}',
+                        context={
+                            'linha_id':valor,
+                            'linha_nome':servico.oee.linhas[valor].nome,
+                            'dadosf':dadof,
+                            'ini': inis,
+                            'fim': fims
+                        },dados=dado,nivel_min=2)
     def post(self,request,valor):
         inis = str(request.POST['ini'])
         fims = str(request.POST['fim'])
@@ -67,16 +66,15 @@ class HistoricoView(View):
             hf.time = f'{hora}:{hf.time.minute} {hf.time.day}/{hf.time.month}/{hf.time.year}'
             hf.t_par = f'{str(int(hf.t_par/60))}:{str(hf.t_par%60)}'
             hf.t_prod = f'{str(int(hf.t_prod/60))}:{str(hf.t_prod%60)}'
-        return render(request,'oee/historico.html',context={
-            'titulo':f'historico {servico.oee.linhas[valor].nome}',
-            'linha_id':valor,
-            'linha_nome':servico.oee.linhas[valor].nome,
-            'dados':dado,
-            'dadosf':dadof,
-            'ini': inis,
-            'fim': fims
-        })
-
+        return logado('oee/historico.html',request,titulo=f'historico {servico.oee.linhas[valor].nome}',
+                        context={
+                            'linha_id':valor,
+                            'linha_nome':servico.oee.linhas[valor].nome,
+                            'dadosf':dadof,
+                            'ini': inis,
+                            'fim': fims
+                        },dados=dado,nivel_min=2)
+                        
 def get_linha(request,id):
     if UserPermission(request, 3):
         l = servico.oee.linhas[id]
