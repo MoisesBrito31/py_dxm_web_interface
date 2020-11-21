@@ -6,7 +6,7 @@ from dxm_oee_modulo.dxm import servico, Modbus, Protocolo
 from dxm_oee_modulo.protocolo.mapa import Evento
 from dxm_oee_modulo.oee_modulo.script import Script
 from time import sleep
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 from collections import namedtuple
 
@@ -327,7 +327,8 @@ def baixaLog(request):
                 for x in j:
                     banco.append(dict_to_obj(x))
                 for x in banco:
-                    H = Hist(linha=x.id,time=datetime.strptime(x.time,'%Y-%m-%d %H:%M:%S'),
+                    calender = datetime.strptime(x.time,'%Y-%m-%d %H:%M:%S')
+                    H = Hist(linha=x.id,time=calender-timedelta(hours=3),
                     oee=x.oee,dis=x.dis,q=x.q,per=x.per,vel_atu=x.vel_atu,bons=x.bons,
                     ruins_total=x.ruins_total,t_par=x.t_par,t_prod=x.t_prod)                    
                     H.save()

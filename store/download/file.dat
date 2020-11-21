@@ -1,1 +1,6 @@
-[falha crc]
+[{"id":0,"time":"2020-11-21 15:23:49","oee":30,"dis":100,"q":100,"per":29,"vel_atu":29,"bons":0,"ruins_total":705,"t_prod":24,"t_par":0},
+{"id":1,"time":"2020-11-21 15:23:49","oee":51,"dis":100,"q":100,"per":49,"vel_atu":29,"bons":0,"ruins_total":706,"t_prod":24,"t_par":0},
+{"id":2,"time":"2020-11-21 15:23:49","oee":61,"dis":100,"q":100,"per":58,"vel_atu":29,"bons":0,"ruins_total":706,"t_prod":24,"t_par":0},
+{"id":0,"time":"2020-11-21 15:25:49","oee":30,"dis":100,"q":100,"per":29,"vel_atu":29,"bons":0,"ruins_total":765,"t_prod":26,"t_par":0},
+{"id":1,"time":"2020-11-21 15:25:49","oee":51,"dis":100,"q":100,"per":49,"vel_atu":29,"bons":0,"ruins_total":766,"t_prod":26,"t_par":0},
+{"id":2,"time":"2020-11-21 15:25:49","oee":61,"dis":100,"q":100,"per":58,"vel_atu":29,"bons":0,"ruins_total":766,"t_prod":26,"t_par":0}]

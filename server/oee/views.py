@@ -21,20 +21,54 @@ class LinhaView(View):
 class HistoricoView(View):
     def get(self, request, valor):
         ago = datetime.now()
-        ini = datetime(ago.year,ago.month,ago.day,0,0,0,0)
+        ini = datetime(ago.year,ago.month,ago.day,0,0,0)
         inis = f'{ago.year}-{ago.month}-{ago.day}T00:00:00'
-        fim = datetime(ago.year,ago.month,ago.day,23,59,0,0)
+        fim = datetime(ago.year,ago.month,ago.day,23,59,0)
         fims = f'{ago.year}-{ago.month}-{ago.day}T23:59:00'
-        dado = Hist.objects.filter(Q(linha__exact=valor),Q(time__gte=ini),Q(time__lte=fim))
-        dadof = Hist.objects.filter(Q(linha__exact=valor),Q(time__gte=ini),Q(time__lte=fim))
-        for h in dado:            
-            h.time = f'{h.time.hour}:{h.time.minute} {h.time.day}/{h.time.month}/{h.time.year}'
+        dado = Hist.objects.filter(Q(linha__exact=valor) & Q(time__gt=ini) & Q(time__lt=fim)).order_by('time')
+        dadof = Hist.objects.filter(Q(linha__exact=valor) & Q(time__gt=ini) & Q(time__lt=fim)).order_by('time')
+        for h in dado:      
+            hora = int(h.time.hour)-3 
+            if hora<0:
+                hora+=23             
+            h.time = f'{hora}:{h.time.minute} {h.time.day}/{h.time.month}/{h.time.year}'
         for hf in dadof:
-            hf.time = f'{hf.time.hour}:{hf.time.minute} {hf.time.day}/{hf.time.month}/{hf.time.year}'
+            hora = int(hf.time.hour)-3 
+            if hora<0:
+                hora+=23       
+            hf.time = f'{hora}:{hf.time.minute} {hf.time.day}/{hf.time.month}/{hf.time.year}'
             hf.t_par = f'{str(int(hf.t_par/60))}:{str(hf.t_par%60)}'
             hf.t_prod = f'{str(int(hf.t_prod/60))}:{str(hf.t_prod%60)}'
         return render(request,'oee/historico.html',context={
-            'titulo':'historico',
+            'titulo':f'historico {servico.oee.linhas[valor].nome}',
+            'linha_id':valor,
+            'linha_nome':servico.oee.linhas[valor].nome,
+            'dados':dado,
+            'dadosf':dadof,
+            'ini': inis,
+            'fim': fims
+        })
+    def post(self,request,valor):
+        inis = str(request.POST['ini'])
+        fims = str(request.POST['fim'])
+        ini = datetime(int(inis[0:4]),int(inis[5:7]),int(inis[8:10]),int(inis[11:13]),int(inis[14:16]),0)
+        fim = datetime(int(fims[0:4]),int(fims[5:7]),int(fims[8:10]),int(fims[11:13]),int(fims[14:16]),0)
+        dado = Hist.objects.filter(Q(linha__exact=valor) & Q(time__gt=ini) & Q(time__lt=fim)).order_by('time')
+        dadof = Hist.objects.filter(Q(linha__exact=valor) & Q(time__gt=ini) & Q(time__lt=fim)).order_by('time')
+        for h in dado:   
+            hora = int(h.time.hour)-3 
+            if hora<0:
+                hora+=23       
+            h.time = f'{hora}:{h.time.minute} {h.time.day}/{h.time.month}/{h.time.year}'
+        for hf in dadof:
+            hora = int(hf.time.hour)-3 
+            if hora<0:
+                hora+=23  
+            hf.time = f'{hora}:{hf.time.minute} {hf.time.day}/{hf.time.month}/{hf.time.year}'
+            hf.t_par = f'{str(int(hf.t_par/60))}:{str(hf.t_par%60)}'
+            hf.t_prod = f'{str(int(hf.t_prod/60))}:{str(hf.t_prod%60)}'
+        return render(request,'oee/historico.html',context={
+            'titulo':f'historico {servico.oee.linhas[valor].nome}',
             'linha_id':valor,
             'linha_nome':servico.oee.linhas[valor].nome,
             'dados':dado,
