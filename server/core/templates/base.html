@@ -35,9 +35,13 @@
                         <a class="nav-link" href="{% url 'sobre' %}">Sobre</a>
                     </li>
                 </ul>
-            </div>
+            </div>            
             {% if titulo != 'Login' %}
             {% if titulo != 'erro' %}
+            <div id="stsScript" class="navbar-nav ml-auto pr-3 invisible">
+                <span class="text-warning m-auto p-2"><strong>DXM Descalibrado</strong></span>
+                <img class="m-auto" src="{% static 'img/alerta.png' %}" width="30" height="30" />
+            </div>
             <div class="col text-right text-light">
                 <img class="img-thumbnail" src="{{ user.img.thumb.url }}" width="40" height="40">
                 olá {{ user.nome }}&nbsp; <strong>[&nbsp; <a href="{% url 'logout' %}">Sair</a>&nbsp; ] </strong>
@@ -107,14 +111,12 @@
                 else {
                     document.getElementById("sts").setAttribute("src", "{% static 'img/notifiFalha.ico' %}");
                 }
-                /*
-                if (re.loging) {
-                    document.getElementById("loging").setAttribute("style", "visibility:visible");
+                if (re.script == 'falha'){
+                    document.getElementById("stsScript").setAttribute("class", "navbar-nav ml-auto pr-3");
                 }
-                else {
-                    document.getElementById("loging").setAttribute("style", "visibility:hidden");
+                else{
+                    document.getElementById("stsScript").setAttribute("class", "navbar-nav ml-auto pr-3 invisible");
                 }
-                */
             }
         }
         xhp.open("Get", "{% url 'online' %}");

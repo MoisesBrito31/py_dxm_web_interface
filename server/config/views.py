@@ -58,6 +58,18 @@ class DxmConfigView(View):
     def get(self,request):
         return logado('config/dxmconfig.html',request,titulo='Programar DXM')
 
+class ResetView(View):
+    def get(self,request):
+        dxm = Protocolo(servico.oee.DXM_Endress)
+        estado = 'Bloqueado'
+        if dxm.fileExist('OEE.sb'):
+            estado = 'Bloqueado'
+        else:
+            estado = 'Desbloqueado'
+        return render(request,'config/reset.html',context={
+            'estado':estado
+        })
+
 class MapAltModo(View):
     def post(self,request):
         m = int(request.POST['modo'])
@@ -182,9 +194,9 @@ def zerarLinha(request,valor):
 def online(request):
     if UserPermission(request,nivel_min=3):
         if servico.statusTcp.find('OnLine')>=0:
-            return HttpResponse(f'{{\"dxm_online\":\"True\"}}')
+            return HttpResponse(f'{{\"dxm_online\":\"True\",\"script\":\"{servico.statusScript}\"}}')
         else:
-            return HttpResponse(f'{{\"dxm_online\":\"False\"}}')
+            return HttpResponse(f'{{\"dxm_online\":\"False\",\"script\":\"{servico.statusScript}\"}}')
     else:
         return HttpResponse('falha')
 
@@ -306,6 +318,8 @@ def baixaLog(request):
         dxm = Protocolo(servico.oee.DXM_Endress)
         if servico.statusTcp.find('OnLine')>=0:
             try:
+                if dxm.fileExist('sbfile1.dat') == False:
+                    return HttpResponse('falha - Nenhum log existente no dxm')
                 dxm.destravar()
                 arqui = dxm.getFile('sbfile1.dat')
                 dados = ''
@@ -339,7 +353,6 @@ def baixaLog(request):
             except Exception as ex:
                 return HttpResponse(f'falha - {str(ex)}')
         else:
-            return HttpResponse('falha')
-        return HttpResponse('falha')
+            return HttpResponse('falha - DXM esta desconectado')
     else:
-        return HttpResponse('falha')
+        return HttpResponse('falha - Você não permissão para executar esta ação')

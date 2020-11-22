@@ -13,12 +13,12 @@
         <div class="col text-left">
             <h2>Configuração do DXM</h2>
         </div>
-        <div class="col text-right btn-group">
+        <div class="col text-right  btn-group">
             <button type="button" class="btn btn-primary" onclick="document.location.href='/config/index'">Rede</button>
             <button type="button" class="btn btn-primary " onclick="document.location.href='/config/turno'">Turno</button>
             <button type="button" class="btn btn-primary " onclick="document.location.href='/config/mapio'">Mapa I/O</button>
             <button type="button" class="btn btn-primary disabled" onclick="document.location.href='/config/dxmconfig'">Programar</button>
-            <button type="button" class="btn btn-primary" onclick="document.location.href='/config/reset'">Destravar</button>
+            <button type="button" class="btn btn-primary " onclick="document.location.href='/config/reset'">Destravar</button>
         </div>
     </div>
     <hr>
@@ -28,22 +28,29 @@
 
 <div class="container-fluid">
     <div class="m-auto" style="max-width:600px">
-        <h2 class="text-center">Calibração do DXM</h2>
-        <p>O processo que se segue ira carregar o xml e o script para que o dxm realize cálculo de OEE <br />
-        Atenção! Durante o processo não desligue ou desconecte o DXM da rede</p>
+        <h2 class="text-center">Liberção do DXM para Uso</h2>
+        <p>
+            O processo que se segue ira desbloquear o uso de arquivos do DXM <br />
+            Todos os aquivos de Log serão apagados, recomenda-se o download do mesmo antes de continuar<br />
+            Atenção! Durante o processo não desligue ou desconecte o DXM da rede
+        </p>
     </div>
     <div class="m-auto pt-4 pb-4" style="max-width:200px">
-        <button id="butInicia" class="btn btn-block btn-success" type="button" onclick="iniciar()">
+        <h3 class="text-center">
+            <span id="estado" class="text-success"></span>
+        </h3>
+    </div>
+    <div class="m-auto pt-4 pb-4" style="max-width:200px">
+        <button id="butInicia" class="btn btn-block btn-success " type="button" onclick="iniciar()">
             <span id="splint" class="spinner-border spinner-border-sm" style="visibility:collapse"></span>
             <span id="butInfo">Iniciar</span>
         </button>
-        
+
     </div>
-    <div class="progress m-auto" style="height:40px; max-width:600px">
+    <div id="barra" class="progress m-auto" style="height:40px; max-width:600px">
         <div id="progress" class="progress-bar progress-bar-striped progress-bar-animated bg-success" style="width:0%;"></div>
     </div>
 </div>
-
 
 
 <script type="text/javascript">
