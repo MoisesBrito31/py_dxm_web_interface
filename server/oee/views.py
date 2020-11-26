@@ -74,7 +74,27 @@ class HistoricoView(View):
                             'ini': inis,
                             'fim': fims
                         },dados=dado,nivel_min=2)
-                        
+
+def relatorio(request,inis,fims,valor):
+    if UserPermission(request,nivel_min=2):
+        ini = datetime(int(inis[0:4]),int(inis[5:7]),int(inis[8:10]),int(inis[11:13]),int(inis[14:16]),0)
+        fim = datetime(int(fims[0:4]),int(fims[5:7]),int(fims[8:10]),int(fims[11:13]),int(fims[14:16]),0)
+        dado = Hist.objects.filter(Q(linha__exact=valor) & Q(time__gt=ini) & Q(time__lt=fim)).order_by('time')
+        arquiv = f"{servico.oee.linhas[valor].nome};iniciada em :;{ini}; terminado em :; {fim}\n"
+        arquiv = f"{arquiv}hora;OEE;Disponibilidade;Qualidade;Preformance;Rodando;Parado;Produzido;ruins/bons;velocidade\n"
+        for h in dado:
+            hr = h.time.hour
+            m = h.time.minute
+            y = h.time.year
+            mh = h.time.month
+            d = h.time.day
+            arquiv = f"{arquiv}{d}/{mh}/{y}  {hr}:{m};{h.oee}%;{h.dis}%;{h.q}%;{h.per}%;{int(h.t_prod/60)}:{h.t_prod%60};{int(h.t_par/60)}:{h.t_par%60};{h.bons};{h.ruins_total};{h.vel_atu}p/m\n"
+        response = HttpResponse(arquiv,content_type=f'text/csv')
+        response['Content-Disposition'] = f'attachment; filename="relatorio.csv"'
+        return response
+    else:
+        return HttpResponse('falha')
+
 def get_linha(request,id):
     if UserPermission(request, 3):
         l = servico.oee.linhas[id]

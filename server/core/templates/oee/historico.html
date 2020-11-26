@@ -224,7 +224,7 @@
         var ini = document.getElementById("ini").value
         var fim = document.getElementById("fim").value
         var xhp = new XMLHttpRequest()
-        var endres = "/oee/relatorio?id=" + {{linha_id}} + "&ini=" + ini + "&fim=" +fim
+        var endres = `/oee/relatorio/${ini}/${fim}/{{linha_id}}`
         document.location.href=endres
     }
 
