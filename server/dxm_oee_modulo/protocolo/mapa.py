@@ -112,7 +112,7 @@ class Mapa():
                 os.mkdir(self.pasta)
             except:
                 pass
-            arquivo = open(f'{self.pasta}\{self.nomeArquivo}','wb')
+            arquivo = open(f'{self.pasta}/{self.nomeArquivo}','wb')
             pickle.dump(self,arquivo)
             arquivo.close()
             xml = Xml(self,pasta='store')

@@ -209,7 +209,7 @@ class Protocolo():
 
     def _estruturaArquivo(self,nome,pasta):
         colecao = []
-        arquivo = open(f'{pasta}\{nome}','r')
+        arquivo = open(f'{pasta}/{nome}','r')
         dados = self._stringTrocaQuebraL(arquivo.read(),decode=False)
         arquivo.close()
         tamanho = len(dados)

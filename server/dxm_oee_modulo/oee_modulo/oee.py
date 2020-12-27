@@ -281,7 +281,7 @@ class Linha():
 class OEE():
     pasta = ''
     nomeArquivo = 'OEE.bin'
-    arquivo = f'{pasta}\{nomeArquivo}'
+    arquivo = f'{pasta}/{nomeArquivo}'
     linhas:Linha=[]
     quantidade:int
     DXM_Status:str
@@ -293,7 +293,7 @@ class OEE():
     def __init__(self,qtd:int,linhas=[],endereco='192.168.0.4',emulador=0,tickLog=60,pasta='',arquivo='OEE.bin'):
         self.pasta = pasta
         self.nomeArquivo = arquivo
-        self.arquivo = f'{pasta}\{arquivo}'
+        self.arquivo = f'{pasta}/{arquivo}'
         if len(linhas)<= 0:
             for x in range(qtd):
                 l = Linha()
@@ -350,7 +350,7 @@ class OEE():
     @staticmethod
     def carrega(pasta,nomeArquivo):
         try:
-            arquivo = open(f'{pasta}\{nomeArquivo}','rb')
+            arquivo = open(f'{pasta}/{nomeArquivo}','rb')
             pic = pickle.load(arquivo)
             arquivo.close()
             return pic
