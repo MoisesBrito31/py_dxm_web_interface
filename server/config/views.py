@@ -265,7 +265,7 @@ def destravar(request):
 def sendScript(request):
     if UserPermission(request,nivel_min=1):
         dxm = Protocolo(servico.oee.DXM_Endress)
-        if dxm.enviaArquivo('OEE.sb','store'):
+        if dxm.enviaArquivo('OEE.sb',''):
             return HttpResponse('ok')
         else:
             return HttpResponse('falha')
@@ -275,7 +275,7 @@ def sendScript(request):
 def sendXml(request):
     if UserPermission(request,nivel_min=1):
         dxm = Protocolo(servico.oee.DXM_Endress)
-        if dxm.enviaArquivo('DXM_OEE.xml','store'):
+        if dxm.enviaArquivo('DXM_OEE.xml',''):
             return HttpResponse('ok')
         else:
             return HttpResponse('falha')
@@ -333,7 +333,7 @@ def baixaLog(request):
                 dados = dados.replace('\n','')
                 dados = dados.replace(',}','}')
                 dados = dados.replace(',]',']')
-                arm = open(f'store\\download\\file.dat','w')
+                arm = open(f'file.dat','w')
                 arm.write( dados.replace(',{',',\n{'))
                 arm.close()
                 j = json.loads(dados)

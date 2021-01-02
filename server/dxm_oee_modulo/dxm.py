@@ -6,8 +6,8 @@ from dxm_oee_modulo.protocolo.mapa import Mapa
 from dxm_oee_modulo.protocolo.protocolo import Protocolo
 from datetime import datetime, timedelta
 
-mapa = Mapa.carrega('store','base.mapa')
-oee = OEE.carrega('store','OEE.bin')
+mapa = Mapa.carrega('','base.mapa')
+oee = OEE.carrega('','OEE.data')
 
 
 class Servico():
@@ -131,7 +131,7 @@ class Ciclo():
                             dados = dados.replace('\n','')
                             dados = dados.replace(',}','}')
                             dados = dados.replace(',]',']')
-                            arm = open(f'store\\download\\file.dat','w')
+                            arm = open(f'file.dat','w')
                             arm.write( dados.replace(',{',',\n{'))
                             arm.close()
                             j = json.loads(dados)

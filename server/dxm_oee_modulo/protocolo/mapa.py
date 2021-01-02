@@ -98,7 +98,7 @@ class Mapa():
     @staticmethod
     def carrega(pasta,nomeArquivo):
         try:
-            arquivo = open(f'{pasta}\{nomeArquivo}','rb')
+            arquivo = open(f'{pasta}{nomeArquivo}','rb')
             pic = pickle.load(arquivo)
             arquivo.close()
             return pic
@@ -112,10 +112,10 @@ class Mapa():
                 os.mkdir(self.pasta)
             except:
                 pass
-            arquivo = open(f'{self.pasta}/{self.nomeArquivo}','wb')
+            arquivo = open(f'{self.pasta}{self.nomeArquivo}','wb')
             pickle.dump(self,arquivo)
             arquivo.close()
-            xml = Xml(self,pasta='store')
+            xml = Xml(self,pasta=self.pasta)
             xml.salvaArquivo()
         except Exception as e:
             print(f'falha ao salvar mapa{str(e)}')

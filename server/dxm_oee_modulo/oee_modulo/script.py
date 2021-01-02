@@ -2,10 +2,10 @@
 #from .oee import Linha
 
 class Script:
-    def __init__(self, linhas, mapa, log, pasta='store', nomeArquivo='OEE.sb'):
+    def __init__(self, linhas, mapa, log, pasta='', nomeArquivo='OEE.sb'):
         self.pasta = pasta
         self.nomeArquivo = nomeArquivo
-        self.arquivo = f'{self.pasta}/{self.nomeArquivo}'
+        self.arquivo = f'{self.pasta}{self.nomeArquivo}'
         self.buffer = []
         self.linhas = linhas
         self.mapa = mapa
