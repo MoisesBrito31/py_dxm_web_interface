@@ -32,7 +32,71 @@
  
  
  
-  <rtu_read> </rtu_read><rtu_write>
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  <rtu_read> </rtu_read><rtu_write>
 </rtu_write> <sched_holidays /> <sched_commands /> <sched_events><event end="00:00:01" name="Turno 1" reg="91" start="00:00:00" on="1" exclude="0" days="SMTWHFR" off="0" /><event end="08:00:01" name="Turno 2" reg="91" start="08:00:00" on="1" exclude="0" days="SMTWHFR" off="0" /><event end="16:00:01" name="Turno 3" reg="91" start="16:00:00" on="1" exclude="0" days="SMTWHFR" off="0" /> </sched_events>
   <astro_clock>
     <set dst="0" lat="0" lon="0" zone="0" />

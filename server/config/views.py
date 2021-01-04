@@ -11,6 +11,7 @@ import json
 from collections import namedtuple
 
 
+
 class IndexView(View):
     def get(self,request):
         dado = servico.oee
@@ -200,28 +201,7 @@ def online(request):
     else:
         return HttpResponse('falha')
 
-def para_dict(obj):
-    # Se for um objeto, transforma num dict
-    if hasattr(obj, '__dict__'):
-        obj = obj.__dict__
 
-    # Se for um dict, lê chaves e valores; converte valores
-    if isinstance(obj, dict):
-        return { k:para_dict(v) for k,v in obj.items() }
-    # Se for uma lista ou tupla, lê elementos; também converte
-    elif isinstance(obj, list) or isinstance(obj, tuple):
-        return [para_dict(e) for e in obj]
-    # Se for qualquer outra coisa, usa sem conversão
-    else: 
-        return obj
-
-class dict_to_obj(object):
-    def __init__(self, d):
-        for a, b in d.items():
-            if isinstance(b, (list, tuple)):
-               setattr(self, a, [obj(x) if isinstance(x, dict) else x for x in b])
-            else:
-               setattr(self, a, obj(b) if isinstance(b, dict) else b)
 
 def getRelogio(request):
     if UserPermission(request,nivel_min=1):
@@ -356,3 +336,30 @@ def baixaLog(request):
             return HttpResponse('falha - DXM esta desconectado')
     else:
         return HttpResponse('falha - Você não permissão para executar esta ação')
+
+def para_dict(obj):
+    # Se for um objeto, transforma num dict
+    if hasattr(obj, '__dict__'):
+        obj = obj.__dict__
+
+    # Se for um dict, lê chaves e valores; converte valores
+    if isinstance(obj, dict):
+        return { k:para_dict(v) for k,v in obj.items() }
+    # Se for uma lista ou tupla, lê elementos; também converte
+    elif isinstance(obj, list) or isinstance(obj, tuple):
+        return [para_dict(e) for e in obj]
+    # Se for qualquer outra coisa, usa sem conversão
+    else: 
+        return obj
+
+class dict_to_obj(object):
+    def __init__(self, d):
+        for a, b in d.items():
+            if isinstance(b, (list, tuple)):
+               setattr(self, a, [obj(x) if isinstance(x, dict) else x for x in b])
+            else:
+               setattr(self, a, obj(b) if isinstance(b, dict) else b)
+
+class objectDict(dict):
+    def __getattr__(self,name):
+        return self.__getitem__(name)
