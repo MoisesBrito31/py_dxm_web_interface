@@ -1,9 +1,0 @@
-[{"id":0,"time":"2020-11-26 19:52:34","oee":30,"dis":100,"q":100,"per":30,"vel_atu":29,"bons":0,"ruins_total":4274,"t_prod":142,"t_par":0},
-{"id":1,"time":"2020-11-26 19:52:34","oee":50,"dis":100,"q":100,"per":50,"vel_atu":29,"bons":0,"ruins_total":4275,"t_prod":142,"t_par":0},
-{"id":2,"time":"2020-11-26 19:52:34","oee":60,"dis":100,"q":100,"per":60,"vel_atu":29,"bons":0,"ruins_total":4275,"t_prod":142,"t_par":0},
-{"id":0,"time":"2020-11-26 20:02:34","oee":30,"dis":100,"q":100,"per":30,"vel_atu":29,"bons":0,"ruins_total":4574,"t_prod":152,"t_par":0},
-{"id":1,"time":"2020-11-26 20:02:34","oee":50,"dis":100,"q":100,"per":50,"vel_atu":29,"bons":0,"ruins_total":4575,"t_prod":152,"t_par":0},
-{"id":2,"time":"2020-11-26 20:02:34","oee":60,"dis":100,"q":100,"per":60,"vel_atu":29,"bons":0,"ruins_total":4575,"t_prod":152,"t_par":0},
-{"id":0,"time":"2020-11-27 14:58:25","oee":0,"dis":0,"q":0,"per":0,"vel_atu":0,"bons":0,"ruins_total":0,"t_prod":0,"t_par":0},
-{"id":1,"time":"2020-11-27 14:58:25","oee":0,"dis":0,"q":0,"per":0,"vel_atu":0,"bons":0,"ruins_total":0,"t_prod":0,"t_par":0},
-{"id":2,"time":"2020-11-27 14:58:25","oee":0,"dis":0,"q":0,"per":0,"vel_atu":0,"bons":0,"ruins_total":0,"t_prod":0,"t_par":0}]
