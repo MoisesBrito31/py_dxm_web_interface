@@ -3,7 +3,7 @@ from django.views.generic import View
 from core.views import logado, UserPermission
 from oee.models import Hist
 from dxm_oee_modulo.dxm import servico, Modbus, Protocolo
-from dxm_oee_modulo.protocolo.mapa import Evento
+from dxm_oee_modulo.protocolo.mapa import Evento, Bloco, Reg
 from dxm_oee_modulo.oee_modulo.script import Script
 from time import sleep
 from datetime import datetime, timedelta
@@ -34,22 +34,34 @@ class MapIoView(View):
         try:
             ret = request.POST['json']
             dic = json.loads(ret)
-            for x in range(len(servico.mapa.blocos)):
-                for y in range(len(servico.mapa.blocos[x].regList)):
-                    servico.mapa.blocos[x].regList[y].slaveID = dic[x]['regList'][y]['slaveID']
-                    servico.mapa.blocos[x].regList[y].reg = dic[x]['regList'][y]['reg']
-                    servico.mapa.blocos[x].regList[y].dword = dic[x]['regList'][y]['dword']
-                    servico.mapa.blocos[x].regList[y].ativo = dic[x]['regList'][y]['ativo']
+            b=[]
+            for x in range(len(dic)):
+                temp_reg = []
+                for y in range(len(dic[x]['regList'])):
+                    temp_reg.append(Reg(
+                        dic[x]['regList'][y]['reg'],
+                        ciclo=dic[x]['regList'][y]['ciclo'],
+                        dword=dic[x]['regList'][y]['dword'],
+                        ativo=dic[x]['regList'][y]['ativo'],
+                        slaveID=dic[x]['regList'][y]['slaveID'],
+                        id=y,
+                        nome=dic[x]['regList'][y]['nome']
+                        ))
+                b.append(Bloco(dic[x]['nome'],temp_reg))
+            servico.mapa.blocos = b
             servico.mapa.salva()
             scr = Script(servico.oee.linhas,servico.mapa,servico.oee.tickLog)
             scr.salvaArquivo()
+            sleep(1)
             dado = servico.mapa.blocos
             s = json.dumps(para_dict(dado))
             return logado('config/mapio.html',request,context={
                 'json':s,
                 'modo':servico.mapa.modo
-            },titulo='Mapa Io',dados=dado,nivel_min=1,msg='executado')
+            },titulo='Mapa Io',dados=b,nivel_min=1,msg='executado')
         except Exception as ex:
+            dado = servico.mapa.blocos
+            s = json.dumps(para_dict(dado))
             return logado('config/mapio.html',request,context={
                 'json':s,
                 'modo':servico.mapa.modo

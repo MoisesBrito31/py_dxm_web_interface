@@ -1,4 +1,4 @@
-linhas=3vel_esp[0]=50forma[0]=0t_p_prog[0]=5NODE[0]=1vel_esp[1]=60forma[1]=0t_p_prog[1]=10NODE[1]=3vel_esp[2]=45forma[2]=0t_p_prog[2]=0NODE[2]=3trig_log=10'inicio
+linhas=5vel_esp[0]=50forma[0]=0t_p_prog[0]=5NODE[0]=1vel_esp[1]=60forma[1]=0t_p_prog[1]=10NODE[1]=4vel_esp[2]=45forma[2]=0t_p_prog[2]=0NODE[2]=7vel_esp[3]=44forma[3]=0t_p_prog[3]=0NODE[3]=1vel_esp[4]=55forma[4]=0t_p_prog[4]=0NODE[4]=1trig_log=5'inicio
 'vers?o 2.0.8
 'linha ? composta de 1-5, conjunto de linhas vai 1-80
 '89 - ativa emulador
