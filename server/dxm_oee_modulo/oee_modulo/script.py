@@ -45,6 +45,15 @@ class Script:
             ret = f'{ret}forma[{x}]={self.linhas[x].forma}\r'
             ret = f'{ret}t_p_prog[{x}]={self.linhas[x].t_p_prog}\r'
             try:
+                """
+                if self.mapa.blocos[x].regList[0].slaveID>1:
+                    ret = f'{ret}NODE[{x}]={int(self.mapa.blocos[x].regList[0].reg/16)*100}\r'
+                    ret = f'{ret}REG0[{x}]={int(self.mapa.blocos[x].regList[0].reg)+int(self.mapa.blocos[x].regList[0].slaveID)*10000}\r'
+                    ret = f'{ret}DWORD0[{x}]={int(self.mapa.blocos[x].regList[0].dword)}\r'
+                    ret = f'{ret}REG1[{x}]={int(self.mapa.blocos[x].regList[1].reg)+int(self.mapa.blocos[x].regList[1].slaveID)*10000}\r'
+                    ret = f'{ret}DWORD1[{x}]={int(self.mapa.blocos[x].regList[1].dword)}\r'
+                else:
+                """
                 ret = f'{ret}NODE[{x}]={int(self.mapa.blocos[x].regList[0].reg/16)}\r'
             except:
                 pass

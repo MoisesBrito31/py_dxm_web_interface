@@ -154,12 +154,10 @@ FUNCTION performace
 				vel_atu[x]=tp
 			END IF			
 		END IF
-			per_temp =t_par+t_prod*vel_esp[x]
+			per_temp =(t_par+t_prod)*vel_esp[x]
 			if per_temp<=0 then
 				per_temp=vel_esp[x]
 			end if
-			'per_temp =vel_atu[x]/vel_esp[x]*100
-			'per[x] = (per[x]+per_temp)/2
 			per[x] = cont_in[x]/per_temp*100
 			if per[x]>100 then
 				per[x]=100
@@ -246,12 +244,28 @@ function zerar
 			t_prodS[x]=0 
 			emuContador[x] =0	
 			zeracount[x]=zeracount[x]+1 
-			WrErr = SETREG(NODE[x]*16+15, ZNODEIN1, 1, 4)
-			WrErr = SETREG(NODE[x]*16+15, ZNODEIN2, 1, 4)
-			WrErr = SETREG(NODE[x]*16+15, ZNODEIN3, 1, 4)
-			WrErr = SETREG(NODE[x]*16+15, ZNODEIN4, 1, 4)
-			WrErr = SETREG(NODE[x]*16+15, ZNODEIN5, 1, 4)
-			WrErr = SETREG(NODE[x]*16+15, ZNODEIN6, 1, 4)
+			if NODE[0]>100 then
+				if REG0[x]>0 then
+					WrErr = SETREG(REG0[x]-int(REG0[x]/10000), 0, int(REG0[x]/10000), 0)
+					if DWORD0[x]>0 then
+						WrErr = SETREG(REG0[x]+1-int(REG0[x]/10000), 0, int(REG0[x]/10000), 0)
+					endif
+				endif
+				if REG1[x]>0 then
+					WrErr = SETREG(REG1[x]-int(REG1[x]/10000), 0, int(REG1[x]/10000), 0)
+					if DWORD1[x]>0 then
+						WrErr = SETREG(REG1[x]+1-int(REG1[x]/10000)*10000, 0, int(REG1[x]/10000), 0)
+					endif
+				endif
+			else
+				WrErr = SETREG(NODE[x]*16+15, ZNODEIN1, 1, 4)
+				WrErr = SETREG(NODE[x]*16+15, ZNODEIN2, 1, 4)
+				WrErr = SETREG(NODE[x]*16+15, ZNODEIN3, 1, 4)
+				WrErr = SETREG(NODE[x]*16+15, ZNODEIN4, 1, 4)
+				WrErr = SETREG(NODE[x]*16+15, ZNODEIN5, 1, 4)
+				WrErr = SETREG(NODE[x]*16+15, ZNODEIN6, 1, 4)
+			endif
+			
 		end if
 		if zeracount[x]>2 then
 			zeracount[x]=0

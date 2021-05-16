@@ -1,5 +1,7 @@
 *.pyc
-vscode
+.vscode
+__pycache__
 venv
+*.sqlite3
 *.exe
 
