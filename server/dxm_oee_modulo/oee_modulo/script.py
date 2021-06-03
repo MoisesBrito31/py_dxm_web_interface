@@ -45,16 +45,21 @@ class Script:
             ret = f'{ret}forma[{x}]={self.linhas[x].forma}\r'
             ret = f'{ret}t_p_prog[{x}]={self.linhas[x].t_p_prog}\r'
             try:
-                """
-                if self.mapa.blocos[x].regList[0].slaveID>1:
-                    ret = f'{ret}NODE[{x}]={int(self.mapa.blocos[x].regList[0].reg/16)*100}\r'
-                    ret = f'{ret}REG0[{x}]={int(self.mapa.blocos[x].regList[0].reg)+int(self.mapa.blocos[x].regList[0].slaveID)*10000}\r'
-                    ret = f'{ret}DWORD0[{x}]={int(self.mapa.blocos[x].regList[0].dword)}\r'
-                    ret = f'{ret}REG1[{x}]={int(self.mapa.blocos[x].regList[1].reg)+int(self.mapa.blocos[x].regList[1].slaveID)*10000}\r'
-                    ret = f'{ret}DWORD1[{x}]={int(self.mapa.blocos[x].regList[1].dword)}\r'
-                else:
-                """
                 ret = f'{ret}NODE[{x}]={int(self.mapa.blocos[x].regList[0].reg/16)}\r'
+                ret = f'{ret}SID0[{x}]={int(self.mapa.blocos[x].regList[0].slaveID)}\r'
+                ret = f'{ret}REG0[{x}]={int(self.mapa.blocos[x].regList[0].reg)}\r'
+                ret = f'{ret}DW0[{x}]={int(self.mapa.blocos[x].regList[0].dword)}\r'
+                ret = f'{ret}SID1[{x}]={int(self.mapa.blocos[x].regList[1].slaveID)}\r'
+                ret = f'{ret}REG1[{x}]={int(self.mapa.blocos[x].regList[1].reg)}\r'
+                ret = f'{ret}DW1[{x}]={int(self.mapa.blocos[x].regList[1].dword)}\r'
+                ret = f'{ret}DW2[{x}]={int(self.mapa.blocos[x].regList[2].dword)}\r'
+                """
+                ret = f'{ret}REG0[{x}]={int(self.mapa.blocos[x].regList[0].reg)+int(self.mapa.blocos[x].regList[0].slaveID)*10000}\r'
+                ret = f'{ret}DWORD0[{x}]={int(self.mapa.blocos[x].regList[0].dword)}\r'
+                ret = f'{ret}REG1[{x}]={int(self.mapa.blocos[x].regList[1].reg)+int(self.mapa.blocos[x].regList[1].slaveID)*10000}\r'
+                ret = f'{ret}DWORD1[{x}]={int(self.mapa.blocos[x].regList[1].dword)}\r'
+                """
+                
             except:
                 pass
         ret = f'{ret}trig_log={self.log}\r'

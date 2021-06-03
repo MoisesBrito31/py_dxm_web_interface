@@ -57,6 +57,7 @@ class Linha():
     t_par:int=0
     t_prod:int=0
     t_p_prog:int=0
+    sts_inv:bool=False
 
     #variaveis de banco:
     historico:Hist = []
@@ -85,9 +86,15 @@ class Linha():
         self.cont_in = cont_in_b2+(cont_in_b1*65536)
         self.cont_out = cont_out_b2+(cont_out_b1*65536)
         if self.maq_sts:
-            self.estado = 'Parado'
+            if self.sts_inv:
+                self.estado = 'Parado'
+            else:
+                self.estado = 'Operando'
         else:
-            self.estado = 'Operando'
+            if self.sts_inv:
+                self.estado = 'Operando'
+            else:
+                self.estado = 'Parado'
         if values[4]==100:
             self.estado = 'Estação OffLine'
 

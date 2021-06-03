@@ -50,6 +50,14 @@ class MapIoView(View):
                 b.append(Bloco(dic[x]['nome'],temp_reg))
             servico.mapa.blocos = b
             servico.mapa.salva()
+            cont_temp=0
+            for r in servico.mapa.blocos:
+                if r.regList[2].dword == '2':
+                    servico.oee.linhas[cont_temp].sts_inv = True
+                else:
+                    servico.oee.linhas[cont_temp].sts_inv = False
+                cont_temp+=1
+            servico.oee.salva()
             scr = Script(servico.oee.linhas,servico.mapa,servico.oee.tickLog)
             scr.salvaArquivo()
             sleep(1)

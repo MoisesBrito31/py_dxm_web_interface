@@ -61,7 +61,7 @@
                         <td>Reg (40x):</td>
                     {% endif %}
                         <td>ciclo(ms):</td>
-                        <td>dword:</td>
+                        <td>DW/Inv:</td>
                         <td>Usar:</td>
                     </tr>
                 </thead>
@@ -82,9 +82,11 @@
                         </td>
                         <td>
                             {% if r.dword == '2' %}
-                                <input {% if r.id == 2 %}disabled{% endif %}  id="{{l.id}}{{r.id}}dword" type="checkbox" class="form-check" checked />
+                                <!--<input {% if r.id == 2 %}disabled{% endif %}  id="{{l.id}}{{r.id}}dword" type="checkbox" class="form-check" checked />-->
+                                <input id="{{l.id}}{{r.id}}dword" type="checkbox" class="form-check" checked />
                             {% else %}
-                                <input {% if r.id == 2 %}disabled{% endif %}  id="{{l.id}}{{r.id}}dword" type="checkbox" class="form-check" />
+                                <!--<input {% if r.id == 2 %}disabled{% endif %}  id="{{l.id}}{{r.id}}dword" type="checkbox" class="form-check" />-->
+                                <input id="{{l.id}}{{r.id}}dword" type="checkbox" class="form-check" />
                             {% endif %}
 
                         </td>
