@@ -28,12 +28,12 @@ class HistoricoView(View):
         dado = Hist.objects.filter(Q(linha__exact=valor) & Q(time__gt=ini) & Q(time__lt=fim)).order_by('time')
         dadof = Hist.objects.filter(Q(linha__exact=valor) & Q(time__gt=ini) & Q(time__lt=fim)).order_by('time')
         for h in dado:      
-            hora = int(h.time.hour)-3 
+            hora = int(h.time.hour) -5
             if hora<0:
                 hora+=23             
             h.time = f'{hora}:{h.time.minute} {h.time.day}/{h.time.month}/{h.time.year}'
         for hf in dadof:
-            hora = int(hf.time.hour)-3 
+            hora = int(hf.time.hour)-5
             if hora<0:
                 hora+=23       
             hf.time = f'{hora}:{hf.time.minute} {hf.time.day}/{hf.time.month}/{hf.time.year}'
@@ -55,12 +55,12 @@ class HistoricoView(View):
         dado = Hist.objects.filter(Q(linha__exact=valor) & Q(time__gt=ini) & Q(time__lt=fim)).order_by('time')
         dadof = Hist.objects.filter(Q(linha__exact=valor) & Q(time__gt=ini) & Q(time__lt=fim)).order_by('time')
         for h in dado:   
-            hora = int(h.time.hour)-3 
+            hora = int(h.time.hour)-5 
             if hora<0:
                 hora+=23       
             h.time = f'{hora}:{h.time.minute} {h.time.day}/{h.time.month}/{h.time.year}'
         for hf in dadof:
-            hora = int(hf.time.hour)-3 
+            hora = int(hf.time.hour)-5
             if hora<0:
                 hora+=23  
             hf.time = f'{hora}:{hf.time.minute} {hf.time.day}/{hf.time.month}/{hf.time.year}'
@@ -83,7 +83,9 @@ def relatorio(request,inis,fims,valor):
         arquiv = f"{servico.oee.linhas[valor].nome};iniciada em :;{ini}; terminado em :; {fim}\n"
         arquiv = f"{arquiv}hora;OEE;Disponibilidade;Qualidade;Preformance;Rodando;Parado;Produzido;ruins/bons;velocidade\n"
         for h in dado:
-            hr = h.time.hour
+            hr = h.time.hour-5
+            if hr<0:
+                hr+=23 
             m = h.time.minute
             y = h.time.year
             mh = h.time.month

@@ -1,4 +1,4 @@
-linhas=2vel_esp[0]=41forma[0]=1t_p_prog[0]=0NODE[0]=1SID0[0]=1REG0[0]=17DW0[0]=1SID1[0]=1REG1[0]=18DW1[0]=1DW2[0]=1vel_esp[1]=35forma[1]=1t_p_prog[1]=0NODE[1]=2SID0[1]=1REG0[1]=33DW0[1]=1SID1[1]=1REG1[1]=34DW1[1]=1DW2[1]=1trig_log=30'inicio
+linhas=1vel_esp[0]=41forma[0]=1t_p_prog[0]=0NODE[0]=1SID0[0]=1REG0[0]=17DW0[0]=1SID1[0]=1REG1[0]=18DW1[0]=1DW2[0]=1trig_log=2'inicio
 'versin 2.1.0
 'adicao de inversao de sts e zerar multi hop 
 'linha ? composta de 1-5, conjunto de linhas vai 1-80
