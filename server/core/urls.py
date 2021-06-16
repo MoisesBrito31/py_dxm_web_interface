@@ -1,12 +1,13 @@
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import IndexView, LoginView, Logout, ErroView, SobreView
+from .views import IndexView, LoginView, Logout, ErroView, SobreView, VueView
 from .views import UsuarioView, UsuarioAdd, UsuarioDelete, UsuarioEdit
 
 
 urlpatterns = [
     path('', IndexView.as_view(), name='index'),
+    path('vue', VueView.as_view(), name='vue'),
     path('erro', ErroView.as_view(), name='erro'),
     path('index', IndexView.as_view(), name='index'),
     path('sobre', SobreView.as_view(), name='sobre'),

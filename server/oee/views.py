@@ -6,6 +6,8 @@ from django.db.models import Q
 from dxm_oee_modulo.dxm import Servico, servico, Modbus
 from datetime import datetime, timedelta
 
+
+
 class IndexView(View):
     def get(self,request):
         dados = servico.oee

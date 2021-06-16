@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block context %}
+
+<link type="text/css" rel="stylesheet" href="{% static 'js/vue_bootstrap/css/bootstrap.min.css' %}" />
+<link type="text/css" rel="stylesheet" href="{% static 'js/vue_bootstrap/css/bootstrap-vue.min.css' %}" />
+<script src="{% static 'js/vue/vue.js' %}"></script> 
+<script src="{% static 'js/vue_bootstrap/js/bootstrap-vue.min.js' %}"></script>
+<script src="{% static 'js/vue_bootstrap/js/bootstrap-vue-icons.min.js' %}"></script>
+<script src="{% static 'js/vue/componentes/main_menu.js' %}"></script>
+
+
+<div id="app" class="mt-5 pt-5 mb-5 pb-5">
+    <div class="mt-5 pt-5 mb-5 pb-5">
+        <main_menu></main_menu>    
+    </div>
+</div>
+
+
+<script>
+
+    var app = new Vue({
+        delimiters: ["[[", "]]"],
+        el:'#app',
+        methods:{
+            logar(){
+                document.location.href="{% url 'index' %}"
+            }
+        }
+    })
+</script>
+
+{% endblock %}

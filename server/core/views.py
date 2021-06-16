@@ -1,4 +1,6 @@
 import datetime
+import json
+from django.http.response import HttpResponse, JsonResponse
 from django.views.generic import View
 from django.shortcuts import render, HttpResponseRedirect, redirect
 from django.conf import settings
@@ -196,4 +198,37 @@ class ErroView(View):
             mensagem = "Falha desconhecida"
         return render(request, 'erro.html', context={'msg': mensagem})
 
+class VueView(View):
+    def get(self,request):
+        return render(self.request,'vue.html')
+    def post(self, request):
+        try:
+            data = json.loads(request.body.decode("utf-8"))
+            print()
+            print()
+            us = data['email']
+            sh = data['senha']
+            try:
+                alvo = request.COOKIES['redirect']
+            except:
+                alvo = '/'
+            try:
+                use = Usuario.objects.get(email=us, senha=sh)
+                use.loggin()
+                use.save()
+            except:
+                return HttpResponse("usuario")
+            """
+            context = {
+                'user': use.nome,
+                'userID': use.token,
+                'msg': 'ok',
+            }   
+            return HttpResponse("ok")
+            """
+            response = HttpResponse("ok")
+            set_cookie(response, 'userID', use.token)
+            return response
+        except Exception as erro:
+            return HttpResponse(f'falha interna no servidor - {str(erro)}')
 
