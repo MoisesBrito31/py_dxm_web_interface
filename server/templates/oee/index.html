@@ -20,7 +20,12 @@
 
 <div class="container-fluid row m-auto">
     {% for l in dados.linhas %}
-        <painel_oee :p_linha="linhas[0]"></painel_oee>
+        <b-row>
+        <painel_oee :oee=45 nome="Linha 1" status="Rodando"></painel_oee>
+        <painel_oee :oee=65 nome="Linha 2" status="Rodando"></painel_oee>
+        <painel_oee :oee=15 nome="Linha 3" status="Rodando"></painel_oee>
+        <painel_oee :oee=95 nome="Linha 4" status="Rodando"></painel_oee>
+        </b-row>
         <!--
         <div class="col-auto">
             <div id="b {{ l.id }}" class="bg-light text-center border rounded mb-5 p-2" style="min-width:250px; max-width:300px;" onclick="document.location.href='/oee/linha/{{ l.id }}'">
@@ -37,18 +42,43 @@
 </div>
 
 
-{{jsLinhas|json_script:"dados.linhas"}}
 <script>
-    var jsLinhas = JSON.parse(document.getElementById('jsLinhas').textContent);
     var data;
     var gage = []
 
     var app = new Vue({
         delimiters: ["[[", "]]"],
         el:'#app',
-        data(){
-            return{
-                linhas=jsLinhas
+        created(){
+            this.load()
+            //setInterval(()=>{this.load()},2000)
+        },
+        data:{
+            dados:[],
+            erro: false,
+        },
+        methods:{
+            load(){
+                this.getLinhas()
+            },
+            async getLinhas(){
+                fetch('/oee/conjunto_linhas',{
+                    method: 'get',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                }).then(res=>{
+                    if(res.status === 200){
+                        return res.text()
+                    }
+                }).then(result=>{
+                    console.log(result)
+                    this.dados = JSON.parse(result)
+                    this.erro= false
+                }).catch(erro=>{
+                    console.log(erro)
+                    this.erro= true
+                })
             }
         },
     })
@@ -95,9 +125,10 @@
 
     }
 
+    /*
     setTimeout(function (){
         setInterval(function () {
-        getlinhas()
+        //getlinhas()
         //getTurno()
         }, 1000)
 
@@ -122,7 +153,7 @@
                   
               }
     }, 500)
-    },1000)
+    },1000)*/
 
     
 
