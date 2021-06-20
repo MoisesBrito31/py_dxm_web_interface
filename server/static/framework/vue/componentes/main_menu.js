@@ -107,9 +107,9 @@ Vue.component('main_menu',{
       },
       dxm_online(){
         if(this.data.dxm_online==="True"){
-          return "static/img/notifiOk.ico";
+          return "/static/img/notifiOk.ico";
         }else{
-          return "static/img/notifiFalha.ico";W
+          return "/static/img/notifiFalha.ico";W
         }
       }
     },

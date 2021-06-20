@@ -158,8 +158,6 @@ class LoginView(View):
     def post(self, request):
         try:
             data = json.loads(request.body.decode("utf-8"))
-            print()
-            print()
             us = data['email']
             sh = data['senha']
             try:

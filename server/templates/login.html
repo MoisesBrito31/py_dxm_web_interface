@@ -2,12 +2,15 @@
 {% load static %}
 {% block context %}
 
-<script src="{% static 'js/vue/componentes/login.js' %}"></script>
+<script src="{% static 'framework/vue/componentes/login.js' %}"></script>
 
 <div id="app">
     <div>
-        <div class="mb-3 pb-3">
+        <div>
             <main_menu></main_menu>
+        </div>
+        <div class="text-center p-4">
+            <img src="/static/img/dxmWebInterface.png" width="100" height="140" />
         </div>
         <div class="m-auto card col-sm-5 mb-5 p-3">
             <login dominio="/login/" @logou="logar"></login>

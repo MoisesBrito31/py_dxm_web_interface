@@ -2,8 +2,13 @@
 {% load static %}
 {% block context %}
 
+<script src="{% static 'js/raphael-2.1.4.min.js' %}"></script>
+<script src="{% static 'js/justgage.js' %}"></script>
+<script src="{% static 'framework/vue/componentes/oee/painel_oee.js' %}"></script>
 
-
+<div id="app">
+<main_menu></main_menu>   
+<b-container fluid>
 <div class="card-title mt-5 mb-3 pt-3">
     <div class="row">
         <div class="col text-left">
@@ -11,12 +16,12 @@
         </div>
     </div>
 </div>
-
-
-
 <hr>
+
 <div class="container-fluid row m-auto">
     {% for l in dados.linhas %}
+        <painel_oee :p_linha="linhas[0]"></painel_oee>
+        <!--
         <div class="col-auto">
             <div id="b {{ l.id }}" class="bg-light text-center border rounded mb-5 p-2" style="min-width:250px; max-width:300px;" onclick="document.location.href='/oee/linha/{{ l.id }}'">
                 <h3 id="l {{ l.id }}">{{ l.nome }}</h3>
@@ -24,16 +29,29 @@
                 <h4><p id="p {{ l.id }}" class="p-2 rounded border border-dark text-center m-auto"> {{ l.estado }}</p>    </h4>            
             </div>
         </div>
+        -->
     {% endfor %}
     
 </div>
+</b-container>
+</div>
 
-<script src="{% static 'js/raphael-2.1.4.min.js' %}"></script>
-<script src="{% static 'js/justgage.js' %}"></script>
 
+{{jsLinhas|json_script:"dados.linhas"}}
 <script>
+    var jsLinhas = JSON.parse(document.getElementById('jsLinhas').textContent);
     var data;
     var gage = []
+
+    var app = new Vue({
+        delimiters: ["[[", "]]"],
+        el:'#app',
+        data(){
+            return{
+                linhas=jsLinhas
+            }
+        },
+    })
 
     var sectors = [{
         color: "#c00002",
