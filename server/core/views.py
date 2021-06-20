@@ -157,21 +157,27 @@ class LoginView(View):
 
     def post(self, request):
         try:
-            us = request.POST['email']
-            sh = request.POST['senha']
+            data = json.loads(request.body.decode("utf-8"))
+            print()
+            print()
+            us = data['email']
+            sh = data['senha']
             try:
-                alvo = request.COOKIES['redirect']
+                use = Usuario.objects.get(email=us, senha=sh)
+                use.loggin()
+                use.save()
             except:
-                alvo = '/'
-            use = Usuario.objects.get(email=us, senha=sh)
-            use.loggin()
-            use.save()
-            response = redirect('/'+alvo)
+                response = HttpResponse("usuario")
+                set_cookie(response, 'userID', "")
+                set_cookie(response, 'userName', "Desconhecido")
+                return response
+           
+            response = HttpResponse("ok")
             set_cookie(response, 'userID', use.token)
+            set_cookie(response, 'userName', use.nome)
             return response
-        except:
-            self.context['msg'] = 'falha'
-            return render(request, 'login.html', self.context)
+        except Exception as erro:
+            return HttpResponse(f'falha interna no servidor - {str(erro)}')
 
 
 class Logout(View):
@@ -187,7 +193,7 @@ class Logout(View):
         user.logout()
         user.save()
         self.context['msg'] = 'ok'
-        return render(request, 'login.html', self.context)
+        return redirect('/login')
 
 
 class ErroView(View):
@@ -209,25 +215,18 @@ class VueView(View):
             us = data['email']
             sh = data['senha']
             try:
-                alvo = request.COOKIES['redirect']
-            except:
-                alvo = '/'
-            try:
                 use = Usuario.objects.get(email=us, senha=sh)
                 use.loggin()
                 use.save()
             except:
-                return HttpResponse("usuario")
-            """
-            context = {
-                'user': use.nome,
-                'userID': use.token,
-                'msg': 'ok',
-            }   
-            return HttpResponse("ok")
-            """
+                response = HttpResponse("usuario")
+                set_cookie(response, 'userID', "")
+                set_cookie(response, 'userName', "Desconhecido")
+                return response
+           
             response = HttpResponse("ok")
             set_cookie(response, 'userID', use.token)
+            set_cookie(response, 'userName', use.nome)
             return response
         except Exception as erro:
             return HttpResponse(f'falha interna no servidor - {str(erro)}')

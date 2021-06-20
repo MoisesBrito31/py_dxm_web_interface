@@ -2,17 +2,10 @@
 {% load static %}
 {% block context %}
 
-<style>
-    .fundo {
-        min-height: 660px;
-        background-image: url("{% static 'img/back25.png' %}");
-        background-repeat: no-repeat;
-        background-size: cover;
-        background-position: center center;
-    }
-</style>
 
-<div class="fundo">
+
+<div id=app>
+    <main_menu></main_menu>
     <!-- Mask & flexbox options-->
     <div class=" mask rgba-black-light align-items-center">
         <!-- Content -->
@@ -21,12 +14,12 @@
             <div class="row">
                 <!--Grid column-->
 
-                <div class="container mb-auto" style="max-width:400px; opacity:1;">
+                <div class="container mb-auto">
                     <div class="card text-center mt-5 mb-5">
                         <div class="card-text">
                             <h2>DXM Web Interface <br /> OEE 3.0</h2>
                         </div>
-                        <img class="mr-auto ml-auto mt-3 mb-3 " src="{% static 'img/dxm100.png' %}" height="250"
+                        <img class="mr-auto ml-auto mt-3 mb-3 " src="/static/img/dxm100.png" height="250"
                             width="180" />
                         <div class="card-footer text-center">Interface responsiva de visualização de aplicação OEE na
                             Plataforma DXM's Series Banner.</div>
@@ -45,31 +38,10 @@
 </div>
 
 <script>
-
-    function get_browser() {
-        var ua = navigator.userAgent, tem, M = ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
-        if (/trident/i.test(M[1])) {
-            tem = /\brv[ :]+(\d+)/g.exec(ua) || [];
-            return { name: 'IE', version: (tem[1] || '') };
-        }
-        if (M[1] === 'Chrome') {
-            tem = ua.match(/\bOPR\/(\d+)/)
-            if (tem != null) { return { name: 'Opera', version: tem[1] }; }
-        }
-        M = M[2] ? [M[1], M[2]] : [navigator.appName, navigator.appVersion, '-?'];
-        if ((tem = ua.match(/version\/(\d+)/i)) != null) { M.splice(1, 1, tem[1]); }
-        return {
-            name: M[0],
-            version: M[1]
-        };
-    }
-    if (get_browser().name.indexOf("Chrome") > -1 || get_browser().name.indexOf("Edge") > -1 || get_browser().name.indexOf("Opera") > -1) { }
-    else {
-        alert("O Navegador Utilizado não é compatível com todos os controles do servidor\r\n recomendamos a utilização do Chrome")
-    }
-
-
-
+    var app = new Vue({
+        delimiters: ["[[", "]]"],
+        el:'#app',
+    })
 </script>
 
 {% endblock %}
