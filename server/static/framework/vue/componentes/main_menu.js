@@ -81,7 +81,7 @@ Vue.component('main_menu',{
                 return res.text()
             }
         }).then(result=>{
-             console.log(result)
+             //console.log(result)
              this.data = JSON.parse(result)
              this.erro= false
         }).catch(erro=>{

@@ -19,39 +19,25 @@
 <hr>
 
 <div class="container-fluid row m-auto">
-    {% for l in dados.linhas %}
-        <b-row>
-        <painel_oee :oee=45 nome="Linha 1" status="Rodando"></painel_oee>
-        <painel_oee :oee=65 nome="Linha 2" status="Rodando"></painel_oee>
-        <painel_oee :oee=15 nome="Linha 3" status="Rodando"></painel_oee>
-        <painel_oee :oee=95 nome="Linha 4" status="Rodando"></painel_oee>
-        </b-row>
-        <!--
-        <div class="col-auto">
-            <div id="b {{ l.id }}" class="bg-light text-center border rounded mb-5 p-2" style="min-width:250px; max-width:300px;" onclick="document.location.href='/oee/linha/{{ l.id }}'">
-                <h3 id="l {{ l.id }}">{{ l.nome }}</h3>
-                <div id="{{ l.id }}"></div>
-                <h4><p id="p {{ l.id }}" class="p-2 rounded border border-dark text-center m-auto"> {{ l.estado }}</p>    </h4>            
-            </div>
-        </div>
-        -->
-    {% endfor %}
-    
+    <div v-for="i in dados" :key="i.id">
+        <painel_oee :id=i.id ref="painel" :oee=i.oee :nome=i.nome :status=i.estado />
+    </div>    
 </div>
 </b-container>
 </div>
 
 
 <script>
-    var data;
-    var gage = []
-
+    
     var app = new Vue({
         delimiters: ["[[", "]]"],
         el:'#app',
         created(){
             this.load()
-            //setInterval(()=>{this.load()},2000)
+            setInterval(()=>{
+                this.load()
+                this.frame()
+            },2000)
         },
         data:{
             dados:[],
@@ -60,6 +46,11 @@
         methods:{
             load(){
                 this.getLinhas()
+            },
+            frame(){
+                for(var x =0;x<this.$refs.painel.length;x++){
+                    this.$refs.painel[x].refresh(this.dados[x].oee,this.dados[x].estado)
+                }               
             },
             async getLinhas(){
                 fetch('/oee/conjunto_linhas',{
@@ -72,7 +63,7 @@
                         return res.text()
                     }
                 }).then(result=>{
-                    console.log(result)
+                    //console.log(result)
                     this.dados = JSON.parse(result)
                     this.erro= false
                 }).catch(erro=>{
@@ -83,115 +74,7 @@
         },
     })
 
-    var sectors = [{
-        color: "#c00002",
-        lo: 0,
-        hi: 20,
-    }, {
-        color: "#febf00",
-        lo: 20,
-        hi: 40,
-    }, {
-        color: "#fdf500",
-        lo: 40,
-        hi: 60,
-    }, {
-        color: "#92d14f",
-        lo: 60,
-        hi: 80,
-    }, {
-        color: "#00af50",
-        lo: 80,
-        hi: 100,
-    }];
-
-    var linhas = {{dados.quantidade}}
-
-
-
-    for(var x = 0; x < linhas; x++) {
-        var a = new JustGage({
-            id: (x).toString(),
-            value: 0,
-            min: 0,
-            max: 100,
-            title: "OEE",
-            symbol: '%',
-            pointer: true,
-            customSectors: sectors,
-            relativeGaugeSize: true
-        })
-        gage.push(a)
-
-    }
-
-    /*
-    setTimeout(function (){
-        setInterval(function () {
-        //getlinhas()
-        //getTurno()
-        }, 1000)
-
-        setInterval(function () {
-         for (x = 0; x < data.length; x++) {                       
-                  if (data[x].estado == "Operando") {
-                      document.getElementById(`p ${x}`).setAttribute("style", "color:green")
-                      document.getElementById(`b ${x}`).setAttribute("class", "bg-light text-center border rounded mb-5 p-2")
-                  }
-                  if (data[x].estado == "Parado") {
-                     
-                      if (document.getElementById(`b ${x}`).getAttribute("class") == "bg-light text-center border rounded mb-5 p-2") {
-                          document.getElementById(`b ${x}`).setAttribute("class", "bg-danger text-center border rounded mb-5 p-2")
-                           document.getElementById(`p ${x}`).setAttribute("style", "color:white")
-                      }
-                      else {
-                          document.getElementById(`b ${x}`).setAttribute("class", "bg-light text-center border rounded mb-5 p-2")
-                           document.getElementById(`p ${x}`).setAttribute("style", "color:red")
-                      }
-                      
-                  }
-                  
-              }
-    }, 500)
-    },1000)*/
-
     
-
-    function getlinhas() {
-        var xhp = new XMLHttpRequest()
-        xhp.onreadystatechange = function () {
-            if (this.readyState === 4 && this.status === 200) {
-                var re = this.responseText
-                //alert(re)
-                data = JSON.parse(re);
-                if (data[0].estado == "DXM OffLine") {
-                    document.location.href = "/oee/offline";
-                }
-                else {
-                    for (x = 0; x < data.length; x++) {
-                        document.getElementById(`l ${x}`).innerHTML = data[x].nome
-                        document.getElementById(`p ${x}`).innerHTML = data[x].estado                        
-                        gage[x].refresh(data[x].oee)
-                    }
-                }
-
-            }
-        }
-        xhp.open("Get", "{% url 'conjunto_linhas' %}");
-        xhp.send();
-    }
-
-    function getTurno() {
-        var xhp = new XMLHttpRequest()
-        xhp.onreadystatechange = function () {
-            if (this.readyState === 4 && this.status === 200) {
-                var re = this.responseText
-                document.getElementById("turno").innerHTML = re;
-            }
-        }
-        xhp.open("Get", "/oee/getTurno");
-        xhp.send();
-    }
 
 </script>
 

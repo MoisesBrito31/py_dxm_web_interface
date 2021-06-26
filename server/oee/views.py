@@ -141,7 +141,7 @@ def conjunto_linhas(request):
     if UserPermission(request, 3):
         dado=''
         for l in servico.oee.linhas:
-            dado = f'{dado}{{\"nome\":\"{l.nome}\",\"estado\":\"{l.estado}\",\"oee\":{l.oee}}},'
+            dado = f'{dado}{{\"id\":{l.id},\"nome\":\"{l.nome}\",\"estado\":\"{l.estado}\",\"oee\":{l.oee}}},'
         dado = dado[0:len(dado)-1]
         return HttpResponse('['+dado+']')
     else:

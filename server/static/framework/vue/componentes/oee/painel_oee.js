@@ -1,16 +1,18 @@
 Vue.component('painel_oee',{
     delimiters: ["[[", "]]"],
     template: `
-    <b-col sm="4">
-        <b-row >[[linha.nome]]</b-row>
-        <b-row id="GAGE"></b-row>
-        <b-row>[[linha.estado]]</b-row>
-    </b-col>
+    <div class="col-auto">
+            <div class="bg-light text-center border rounded mb-5 p-2" style="min-width:150px; max-width:250px;" v-on:click="acessaLinha" >
+                <h3 id="l {{ l.id }}">[[linha.nome]]</h3>
+                <div :id="linha.id"></div>
+                <h4><p class="p-2 rounded border border-dark text-center m-auto">[[linha.estado]]</p>    </h4>            
+            </div>
+        </div>
     `,
     created(){
         setTimeout(()=>{
             this.gage = new JustGage({
-                id: "GAGE",
+                id: this.id,
                 value: this.oee,
                 min: 0,
                 max: 100,
@@ -25,7 +27,7 @@ Vue.component('painel_oee',{
     },
     data(){
         return{
-            linha: {'nome':this.nome,'oee':this.oee,'estado':this.status},
+            linha: {'id':this.id,'nome':this.nome,'oee':this.oee,'estado':this.status},
             gage: {},
             sectors: [{
                 color: "#c00002",
@@ -51,6 +53,7 @@ Vue.component('painel_oee',{
         }
     },
     props:{
+        id: Number,
         nome: String,
         oee: Number,
         status: String,
@@ -58,5 +61,12 @@ Vue.component('painel_oee',{
     computed:{
     },
     methods:{
+        acessaLinha(){
+           document.location.href=`/oee/linha/${this.linha.id}`
+        },
+        refresh(valor,status){
+            this.gage.refresh(valor)
+            this.linha.estado=status
+        }
     },
 })
