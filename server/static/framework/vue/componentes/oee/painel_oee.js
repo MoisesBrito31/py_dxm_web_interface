@@ -3,9 +3,15 @@ Vue.component('painel_oee',{
     template: `
     <div class="col-auto">
             <div class="bg-light text-center border rounded mb-5 p-2" style="min-width:150px; max-width:250px;" v-on:click="acessaLinha" >
+            <div :class="fundo_bg">
                 <h3 id="l {{ l.id }}">[[linha.nome]]</h3>
                 <div :id="linha.id"></div>
-                <h4><p class="p-2 rounded border border-dark text-center m-auto">[[linha.estado]]</p>    </h4>            
+                <h4>
+                    <p class="p-2 rounded border border-dark text-center m-auto">
+                        <span :class="texto_bg">[[linha.estado]]</span>
+                    </p>    
+                </h4>  
+            </div>          
             </div>
         </div>
     `,
@@ -22,11 +28,15 @@ Vue.component('painel_oee',{
                 customSectors: this.sectors,
                 relativeGaugeSize: true
             })
-            //this.gage.refresh(this.linha.oee)
         },100)
+        setInterval(() => {
+            this.pisca()
+        }, 1000);
     },
     data(){
         return{
+            fundo_bg:"bg-light",
+            texto_bg:"text-dark",
             linha: {'id':this.id,'nome':this.nome,'oee':this.oee,'estado':this.status},
             gage: {},
             sectors: [{
@@ -58,9 +68,23 @@ Vue.component('painel_oee',{
         oee: Number,
         status: String,
     },
-    computed:{
+    computed:{        
     },
     methods:{
+        pisca(){
+            if(this.linha.estado=="Parado"){
+                if(this.fundo_bg=="bg-danger"){
+                    this.fundo_bg="bg-light"
+                    this.texto_bg="text-danger"
+                }else{
+                    this.fundo_bg="bg-danger"
+                    this.texto_bg="text-light"
+                }
+            }else{
+                this.fundo_bg="bg-light"
+                this.texto_bg="text-success"
+            }
+        },
         acessaLinha(){
            document.location.href=`/oee/linha/${this.linha.id}`
         },
