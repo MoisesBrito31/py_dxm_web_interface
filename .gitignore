@@ -2,6 +2,9 @@
 .vscode
 __pycache__
 venv
+base.mapa
+file.dat
+OEE.data
 *.sqlite3
 *.exe
 

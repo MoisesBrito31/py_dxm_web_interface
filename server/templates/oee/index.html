@@ -5,6 +5,7 @@
 <script src="{% static 'js/raphael-2.1.4.min.js' %}"></script>
 <script src="{% static 'js/justgage.js' %}"></script>
 <script src="{% static 'framework/vue/componentes/oee/painel_oee.js' %}"></script>
+<script src="{% static 'framework/vue/componentes/utils/gage.js' %}"></script>
 
 <div id="app">
 <main_menu></main_menu>   
@@ -19,6 +20,8 @@
 <hr>
 
 <div class="container-fluid row m-auto">
+    <input type="number" v-model="num" v-on:change="altera">
+    <gage ref="gage" id="gage" :value=45 symbol="m" :anima=true title="Distancia" :min=0 :max=1000></gage>
     <div v-for="i in dados" :key="i.id">
         <painel_oee :id=i.id ref="painel" :oee=i.oee :nome=i.nome :status=i.estado />
     </div>    
@@ -42,10 +45,14 @@
         data:{
             dados:[],
             erro: false,
+            num: 0,
         },
         methods:{
             load(){
                 this.getLinhas()
+            },
+            altera(){
+                this.$refs.gage.refresh(this.num)
             },
             frame(){
                 for(var x =0;x<this.$refs.painel.length;x++){
