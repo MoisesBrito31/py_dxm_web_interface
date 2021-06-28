@@ -5,7 +5,7 @@ Vue.component('painel_oee',{
             <div class="bg-light text-center border rounded mb-5 p-2" style="min-width:150px; max-width:250px;" v-on:click="acessaLinha" >
             <div :class="fundo_bg">
                 <h3 id="l {{ l.id }}">[[linha.nome]]</h3>
-                <div :id="linha.id"></div>
+                <gage :anima=true ref="gage" :id="linha.id" title="OEE" symbol="%" ></gage>
                 <h4>
                     <p class="p-2 rounded border border-dark text-center m-auto">
                         <span :class="texto_bg">[[linha.estado]]</span>
@@ -16,19 +16,6 @@ Vue.component('painel_oee',{
         </div>
     `,
     created(){
-        setTimeout(()=>{
-            this.gage = new JustGage({
-                id: this.id,
-                value: this.oee,
-                min: 0,
-                max: 100,
-                title: "OEE",
-                symbol: '%',
-                pointer: true,
-                customSectors: this.sectors,
-                relativeGaugeSize: true
-            })
-        },100)
         setInterval(() => {
             this.pisca()
         }, 1000);
@@ -37,50 +24,45 @@ Vue.component('painel_oee',{
         return{
             fundo_bg:"bg-light",
             texto_bg:"text-dark",
-            linha: {'id':this.id,'nome':this.nome,'oee':this.oee,'estado':this.status},
-            gage: {},
-            sectors: [{
-                color: "#c00002",
-                lo: 0,
-                hi: 20,
-            }, {
-                color: "#febf00",
-                lo: 20,
-                hi: 40,
-            }, {
-                color: "#fdf500",
-                lo: 40,
-                hi: 60,
-            }, {
-                color: "#92d14f",
-                lo: 60,
-                hi: 80,
-            }, {
-                color: "#00af50",
-                lo: 80,
-                hi: 100,
-            }],
+            linha: {'id':this.id,'nome':this.title,'oee':this.oee,'estado':this.status},
         }
     },
     props:{
-        id: Number,
-        nome: String,
-        oee: Number,
-        status: String,
+        id: {
+            type: [String,Number],
+            required: true,
+        },
+        title:{
+            type: String,
+            required: false,
+            default: "",
+        },
+        oee:{
+            type: Number,
+            required: false,
+            default: 0,
+        },
+        status:{
+            type: String,
+            required: false,
+            default: "Parado",
+        },
     },
     computed:{        
     },
     methods:{
         pisca(){
             if(this.linha.estado=="Parado"){
+                this.$refs.gage.emit_alerta(true)
                 if(this.fundo_bg=="bg-danger"){
-                    this.fundo_bg="bg-light"
+                    this.fundo_bg="bg-light animate__animated"
                     this.texto_bg="text-danger"
                 }else{
                     this.fundo_bg="bg-danger"
                     this.texto_bg="text-light"
                 }
             }else{
+                this.$refs.gage.emit_alerta(false)
                 this.fundo_bg="bg-light"
                 this.texto_bg="text-success"
             }
@@ -89,7 +71,7 @@ Vue.component('painel_oee',{
            document.location.href=`/oee/linha/${this.linha.id}`
         },
         refresh(valor,status){
-            this.gage.refresh(valor)
+            this.$refs.gage.refresh(valor)
             this.linha.estado=status
         }
     },

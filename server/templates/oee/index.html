@@ -20,10 +20,8 @@
 <hr>
 
 <div class="container-fluid row m-auto">
-    <input type="number" v-model="num" v-on:change="altera">
-    <gage ref="gage" id="gage" :value=45 symbol="m" :anima=true title="Distancia" :min=0 :max=1000></gage>
     <div v-for="i in dados" :key="i.id">
-        <painel_oee :id=i.id ref="painel" :oee=i.oee :nome=i.nome :status=i.estado />
+        <painel_oee :id=i.id ref="painel" :oee=i.oee :title=i.nome :status=i.estado />
     </div>    
 </div>
 </b-container>

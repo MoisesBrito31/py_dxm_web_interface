@@ -55,7 +55,7 @@ Vue.component('gage',{
     },
     props:{
         id: {
-            type: String,
+            type: [String,Number],
             required: true,
         },
         anima:{
@@ -100,7 +100,7 @@ Vue.component('gage',{
         pisca(){
             if(this.alerta){
                 if(this.fundo_bg=="bg-danger"){
-                    this.fundo_bg="bg-light"
+                    this.fundo_bg="bg-light animate__animated"
                 }else{
                     this.fundo_bg="bg-danger"
                 }
