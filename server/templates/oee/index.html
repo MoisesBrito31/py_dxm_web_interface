@@ -21,7 +21,9 @@
 
 <div class="container-fluid row m-auto">
     <div v-for="i in dados" :key="i.id">
-        <painel_oee :id=i.id ref="painel" :oee=i.oee :title=i.nome :status=i.estado />
+        <div class="col-auto m-1">
+            <painel_oee :id=i.id ref="painel" :oee=i.oee :title=i.nome :status=i.estado />
+        </div>
     </div>    
 </div>
 </b-container>
