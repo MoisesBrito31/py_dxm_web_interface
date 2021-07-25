@@ -7,6 +7,9 @@
 <script src="{% static 'js/Chart.js'%}"></script>
 <script src="{% static 'js/chart.util.js'%}"></script>
 
+<div id="app">
+    <main_menu></main_menu>   
+    <b-container fluid>
 <div class="card-title mt-5 mb-3 pt-3">
     <div class="row">
         <div class="col text-left"><h2>{{linha_nome}} - Histórico</h2></div>
@@ -20,213 +23,149 @@
             </div>
         </div>
     </div>
-
 </div>
-<form method="post" action="/oee/historico/{{linha_id}}">
-    {% csrf_token %}
-    <div class="m-auto mt-5 form-inline form-group">
-        <label>data inicial:</label>
-        <input type="datetime-local" class="form-control mr-3" name="ini" id="ini" value="{{ini}}" />
-        <label>data final:</label>
-        <input type="datetime-local" class="form-control mr-3" name="fim" id="fim" value="{{fim}}" />
-        <button type="submit" class="btn btn-primary mr-3">Aplicar</button>
-        <button type="button" class="btn btn-primary" onclick="gerarRelatorio()">Relatório</button>
-    </div>
-</form>
 <hr>
-<div class="container-fluid m-auto">
 
-    
-    <div class="m-auto" style="width:80%;">
-        <canvas id="canvas"></canvas>
-    </div>
-    
-    <hr />
-    <div>
-        <table class="table">
-            <thead class="thead-dark">
-                <tr class="text-center m-auto">
-                    <th>Hora</th>
-                    <th>OEE</th>
-                    <th>Disponibilidade</th>
-                    <th>Qualidade</th>
-                    <th>Performance</th>
-                    <th>Rodando</th>
-                    <th>Parado</th>
-                    <th>Produzido</th>
-                    <th>Ruins/Bons</th>
-                    <th>Velocidade</th>
-                </tr>
-            </thead>
-            <tbody>
-               {% for l in dadosf %}
-                <tr class="text-center m-auto">
-                    <th class="text-left">{{l.time}}</th>
-                    <th>{{l.oee}} %</th>
-                    <th>{{l.dis}} %</th>
-                    <th>{{l.q}} %</th>
-                    <th>{{l.per}} %</th>
-                    <th>{{l.t_prod}}</th>
-                    <th>{{l.t_par}}</th>
-                    <th>{{l.ruins_total}}</th>
-                    <th>{{l.bons}}</th>
-                    <th>{{l.vel_atu}}</th>
-                </tr>
-                {% endfor %}
-                <tr class="text-center m-auto"><th>--</th><th>--</th><th>--</th><th>--</th><th>--</th><th>--</th><th>--</th><th>--</th><th>--</th><th>--</th></tr>
-            </tbody>
-        </table>
-    </div>
+<div id="timerPikers">
+    <label class="m-auto pr-3" for="ini-data">Data Inicial:</label>
+    <b-input-group>
+        <b-form-input
+            @change=" mudaDataIni(false)"
+            :state="iniDataState"
+            id="ini-data"
+            v-model="iniDataFormatada"
+            type="text"
+            autocomplete="off"
+            placeholder="DD-MM-AAAA"
+        ></b-form-input>
+        <b-input-group-append>
+            <b-form-datepicker
+                @input=" mudaDataIni(true)"
+                v-model="iniData"
+                right
+                button-only
+                locale="br"
+                area-controls="ini-data"
+            ></b-form-datepicker>
+        </b-input-group-append>
+    </b-input-group>
+        <b-input-group>
+        <b-form-input
+            @change="mudaTimeIni(false)"
+            :state="iniTimeState"
+            id="ini-time"
+            v-model="iniTimeFormatada"
+            type="text"
+            autocomplete="off"
+            placeholder="HH:MM"
+        ></b-form-input>
+        <b-input-group-append>
+            <b-form-timepicker
+                @input="mudaTimeIni(true)"
+                v-model="iniTime"
+                locale="br"
+                v-bind="timeLabels"
+                right
+                button-only
+                area-controls="ini-time"
+            ></b-form-timepicker>
+        </b-input-group-append>
+    </b-input-group>
+</div>
+
+</b-container>
 </div>
 
 <script>
-		var config = {
-			type: 'line',
-			data: {
-                labels: [
-                        {% for x in dados%}
-                        '{{x.time}}',
-                        {% endfor %}
-                ],
-				datasets: [{
-                    label: 'OEE (%)',
-					backgroundColor: window.chartColors.red,
-					borderColor: window.chartColors.red,
-					data: [
-                        {% for x in dados%}
-                        {{x.oee}},
-                        {% endfor %}
-                    ],
-					fill: false,
-				}, {
-                    label: 'Disponibilidade (%)',
-					fill: false,
-					backgroundColor: window.chartColors.blue,
-					borderColor: window.chartColors.blue,
-					data: [
-                        {% for x in dados%}
-                        {{x.dis}},
-                        {% endfor %}
-                    ],
-                 },{
-                    label: 'Qualidade (%)',
-                     fill: false,
-                     backgroundColor: window.chartColors.yellow,
-                     borderColor: window.chartColors.yellow,
-                        data: [
-                            {% for x in dados%}
-                            {{x.q}},
-                            {% endfor %}
-                        ],
-                      },{
-                    label: 'Performance (%)',
-                     fill: false,
-                     backgroundColor: window.chartColors.green,
-                     borderColor: window.chartColors.green,
-                        data: [
-                        {% for x in dados%}
-                        {{x.per}},
-                        {% endfor %}
-                        ],
-                      },{
-                    label: 'Rodando(min)',
-                     fill: false,
-                     backgroundColor: "rgb(128,255,128)",
-                     borderColor: "rgb(128,255,128)",
-                        data: [
-                        {% for x in dados%}
-                        {{x.t_prod}},
-                        {% endfor %}
-                        ],
-                      },{
-                      label: 'Parado(min)',
-                     fill: false,
-                     backgroundColor: window.chartColors.grey,
-                     borderColor: window.chartColors.grey,
-                        data: [
-                        {% for x in dados%}
-                        {{x.t_par}},
-                        {% endfor %}
-                        ],
-                      },{
-                      label: 'Produzido(p)',
-                     fill: false,
-                     backgroundColor: window.chartColors.purple,
-                     borderColor:window.chartColors.purple,
-                        data: [
-                        {% for x in dados%}
-                        {{x.ruins_total}},
-                        {% endfor %}
-                        ],
-                     },{
-                      label: 'Ruins/Bons(p)',
-                     fill: false,
-                     backgroundColor: window.chartColors.orange,
-                     borderColor: window.chartColors.orange,
-                        data: [
-                        {% for x in dados%}
-                        {{x.bons}},
-                        {% endfor %}
-                        ],
-                     },{
-                      label: 'Velocidade(p/m)',
-                     fill: false,
-                     backgroundColor: "rgb(184,134,11)",
-                     borderColor: "rgb(184,134,11)",
-                     data: [
-                        {% for x in dados%}
-                        {{x.vel_atu}},
-                        {% endfor %}
-                     ],
-                 }]
-			},
-			options: {
-				responsive: true,
-				title: {
-					display: true,
-					text: 'Linha do Tempo'
-				},
-				tooltips: {
-					mode: 'index',
-					intersect: false,
-				},
-				hover: {
-					mode: 'nearest',
-					intersect: true
-				},
-				scales: {
-					xAxes: [{
-						display: true,
-						scaleLabel: {
-							display: true,
-							labelString: 'Data'
-						}
-					}],
-					yAxes: [{
-						display: true,
-						scaleLabel: {
-							display: true,
-							labelString: 'Valor'
-						}
-					}]
-				}
-			}
-		};
 
-        setTimeout(function(){
-            var ctx = document.getElementById('canvas').getContext('2d');
-			window.myLine = new Chart(ctx, config);
-        },500)
-
-
-        var colorNames = Object.keys(window.chartColors);
-        function gerarRelatorio() {
-        var ini = document.getElementById("ini").value
-        var fim = document.getElementById("fim").value
-        var xhp = new XMLHttpRequest()
-        var endres = `/oee/relatorio/${ini}/${fim}/{{linha_id}}`
-        document.location.href=endres
-    }
+var app = new Vue({
+        delimiters: ["[[", "]]"],
+        el:'#app',
+        created(){
+            this.load()
+        },
+        data:{
+            ini:"{{ini}}",
+            iniData: "",
+            iniDataFormatada:"",
+            iniDataState: false,
+            iniTime: "",
+            iniTimeFormatada: "",
+            iniTimeState: false,
+            timeLabels: {
+                labelHours: 'Horas',
+                labelMinutes: 'Minutos',
+                labelSeconds: 'Segundos',
+                labelIncrement: '+',
+                labelDecrement: '-',
+                labelSelected: 'Selecionado',
+                labelNoTimeSelected: 'Sem Seleção',
+                labelCloseButton: 'Fechar'
+                }
+        },
+        computed:{  
+        },
+        methods:{
+            load(){
+                buffer = this.ini.split('T')
+                this.iniData = buffer[0]
+                this.mudaDataIni(true)
+                this.iniTime = buffer[1]
+                this.mudaTimeIni(true)
+            },
+            mudaIni(){
+                if(this.iniDataState && this.iniTimeState){
+                    this.ini=`${this.iniData}T${this.iniTime}`
+                }else{
+                    this.ini=""
+                }
+            },
+            mudaDataIni(reverter){
+                if(reverter){
+                    var buffer = this.iniData.split('-')
+                }else{
+                    var buffer = this.iniDataFormatada.split('-')
+                }
+                if(buffer.length==3){
+                    if(reverter){this.iniDataFormatada = `${buffer[2]}-${buffer[1]}-${buffer[0]}`}
+                    else{this.iniData = `${buffer[2]}-${buffer[1]}-${buffer[0]}`}
+                    this.iniDataState=true
+                    this.mudaIni()
+                }
+                else{
+                    this.iniDataFormatada=""
+                    this.iniData=""
+                    this.iniDataState=false
+                }
+            },
+            mudaTimeIni(reverter){
+                if(reverter){
+                    var buffer = this.iniTime.split(':')
+                    this.iniTimeFormatada=`${buffer[0]}:${buffer[1]}`
+                    this.iniTimeState=true
+                    this.mudaIni()
+                }else{
+                    var buffer = this.iniTimeFormatada.split(':')
+                    if(buffer.length==2){
+                        if(buffer[0]>=0 && buffer[0]<24 && buffer[1]>-1 && buffer[1]<61){
+                            this.iniTime=this.iniTimeFormatada
+                            this.iniTimeState=true
+                            this.mudaIni()
+                        }else{
+                            this.iniTimeState=false
+                            this.iniTime=""
+                            this.iniTimeFormatada=""
+                        }
+                    }else{
+                        this.iniTime=""
+                        this.iniTimeFormatada=""
+                        this.iniTimeState=false
+                    }
+                }
+            },
+            
+        },
+    })
 
 </script>
 
