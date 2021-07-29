@@ -40,6 +40,14 @@
         <b-button block v-bind:class="{disabled:!dataCheck}" variant="primary" @click="filtra" >Aplicar</b-button>
      </b-col>
 </b-row>  
+
+<div>
+<b-table responsive :fields="campos" :items="items">
+
+</b-table>
+
+</div>
+
 </b-container>
 </div>
 
@@ -55,7 +63,10 @@ var app = new Vue({
             form: new FormData(),
             ini:"",
             fim:"",
-            dataCheck:false
+            dataCheck:false,
+            campos:["hora","OEE","Disponibilidade","Qualidade",
+            "Performance","Rodando","Parado","Produzido","Ruins/Bons","Velocidade"],
+            items:[],
         },
         computed:{  
         },
@@ -77,7 +88,7 @@ var app = new Vue({
                     body: this.dataFormat()
             }).then(res=>{
                 if(res.status === 200){
-                    document.documentElement = res.text()
+                   return res.json()
                 }else if(res.status===400) {
                     console.log("erro 400")
                 }else{
@@ -85,6 +96,7 @@ var app = new Vue({
                 }
             }).then(result=>{
                  console.log(result)
+                 this.items = result
             }).catch(erro=>{
                 console.log(erro)
             })

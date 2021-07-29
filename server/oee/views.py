@@ -56,32 +56,21 @@ class HistoricoView(View):
         iniTA=inis.split('T')[1].split(':')
         fimDA=fims.split('T')[0].split('-')
         fimTA=fims.split('T')[1].split(':')
-        #ini = datetime(int(inis[0:4]),int(inis[5:7]),int(inis[8:10]),int(inis[11:13]),int(inis[14:16]),0)
-        #fim = datetime(int(fims[0:4]),int(fims[5:7]),int(fims[8:10]),int(fims[11:13]),int(fims[14:16]),0)
         ini = datetime(int(iniDA[0]),int(iniDA[1]),int(iniDA[2]),int(iniTA[0]),int(iniTA[1]),0)
         fim = datetime(int(fimDA[0]),int(fimDA[1]),int(fimDA[2]),int(fimTA[0]),int(fimTA[1]),0)
-        dado = Hist.objects.filter(Q(linha__exact=valor) & Q(time__gt=ini) & Q(time__lt=fim)).order_by('time')
         dadof = Hist.objects.filter(Q(linha__exact=valor) & Q(time__gt=ini) & Q(time__lt=fim)).order_by('time')
-        for h in dado:   
-            hora = int(h.time.hour)-5 
-            if hora<0:
-                hora+=23       
-            h.time = f'{hora}:{h.time.minute} {h.time.day}/{h.time.month}/{h.time.year}'
+        strinfy = '['
+        
         for hf in dadof:
             hora = int(hf.time.hour)-5
             if hora<0:
                 hora+=23  
             hf.time = f'{hora}:{hf.time.minute} {hf.time.day}/{hf.time.month}/{hf.time.year}'
-            hf.t_par = f'{str(int(hf.t_par/60))}:{str(hf.t_par%60)}'
-            hf.t_prod = f'{str(int(hf.t_prod/60))}:{str(hf.t_prod%60)}'
-        return logado('oee/historico.html',request,titulo=f'historico {servico.oee.linhas[valor].nome}',
-                        context={
-                            'linha_id':valor,
-                            'linha_nome':servico.oee.linhas[valor].nome,
-                            'dadosf':dadof,
-                            'ini': inis,
-                            'fim': fims
-                        },dados=dado,nivel_min=2)
+            #hf.t_par = f'{str(int(hf.t_par/60))}:{str(hf.t_par%60)}'
+            #hf.t_prod = f'{str(int(hf.t_prod/60))}:{str(hf.t_prod%60)}'
+            strinfy = f'{strinfy}{{"hora":"{hf.time}","OEE":{hf.oee},"Disponibilidade":{hf.dis},"Qualidade":{hf.q},"Performance":{hf.per},"Rodando":{hf.t_prod},"Parado":{hf.t_par},"Produzido":{hf.bons},"Ruins/Bons":{hf.ruins_total},"Velocidade":{hf.vel_atu}}},'
+        strinfy = strinfy[:len(strinfy)-1]+"]"
+        return HttpResponse(strinfy)
 
 def relatorio(request,inis,fims,valor):
     if UserPermission(request,nivel_min=2):
