@@ -59,7 +59,7 @@ class HistoricoView(View):
         ini = datetime(int(iniDA[0]),int(iniDA[1]),int(iniDA[2]),int(iniTA[0]),int(iniTA[1]),0)
         fim = datetime(int(fimDA[0]),int(fimDA[1]),int(fimDA[2]),int(fimTA[0]),int(fimTA[1]),0)
         dadof = Hist.objects.filter(Q(linha__exact=valor) & Q(time__gt=ini) & Q(time__lt=fim)).order_by('time')
-        strinfy = '['
+        strinfy = ""
         
         for hf in dadof:
             hora = int(hf.time.hour)-5
@@ -69,7 +69,7 @@ class HistoricoView(View):
             #hf.t_par = f'{str(int(hf.t_par/60))}:{str(hf.t_par%60)}'
             #hf.t_prod = f'{str(int(hf.t_prod/60))}:{str(hf.t_prod%60)}'
             strinfy = f'{strinfy}{{"hora":"{hf.time}","OEE":{hf.oee},"Disponibilidade":{hf.dis},"Qualidade":{hf.q},"Performance":{hf.per},"Rodando":{hf.t_prod},"Parado":{hf.t_par},"Produzido":{hf.bons},"Ruins/Bons":{hf.ruins_total},"Velocidade":{hf.vel_atu}}},'
-        strinfy = strinfy[:len(strinfy)-1]+"]"
+        strinfy = "[" + strinfy[:len(strinfy)-1] + "]"
         return HttpResponse(strinfy)
 
 def relatorio(request,inis,fims,valor):

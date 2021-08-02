@@ -3,11 +3,10 @@
 {% block context %}
 
 <script src="{% static 'js/moment.js'%}"></script>
-<script src="{% static 'js/Chart.min.js'%}"></script>
 <script src="{% static 'js/Chart.js'%}"></script>
-<script src="{% static 'js/chart.util.js'%}"></script>
 
 <script src="{% static 'framework/vue/componentes/utils/input_datetime.js' %}"></script>
+<script src="{% static 'framework/vue/componentes/utils/chart.js' %}"></script>
 
 <div id="app">
     <main_menu></main_menu>   
@@ -41,11 +40,14 @@
      </b-col>
 </b-row>  
 
-<div>
-<b-table responsive :fields="campos" :items="items">
-
+<div class="text-center">
+<b-table responsive :fields="campos" :items="items" 
+    head-variant="dark" sticky-header="400px">
 </b-table>
+</div>
 
+<div >
+    <chart ref="chart" :data="items"></chart>
 </div>
 
 </b-container>
@@ -95,8 +97,8 @@ var app = new Vue({
                     throw 'Erro - servidor fora do ar '
                 }
             }).then(result=>{
-                 console.log(result)
                  this.items = result
+                 this.$refs.chart.refresh(this.items,"hora")
             }).catch(erro=>{
                 console.log(erro)
             })
