@@ -2,211 +2,44 @@
 {% load static %}
 {% block context %}
 
-
-<div class="card-title mt-5 mb-3 pt-3">
-    <div class="row mb-5">
-        <div class="col text-left">
-            <h2>Configuração do DXM</h2>
-        </div>
-        <div class="col-auto text-right  btn-group">
-            <button type="button" class="btn btn-primary disabled" onclick="#">Rede</button>
-            <button type="button" class="btn btn-primary " onclick="document.location.href='/config/turno'">Turno</button>
-            <button type="button" class="btn btn-primary" onclick="document.location.href='/config/mapio'">Mapa I/O</button>
-            <button type="button" class="btn btn-primary" onclick="document.location.href='/config/dxmconfig'">Programar</button>
-            <button type="button" class="btn btn-primary" onclick="document.location.href='/config/reset'">Destravar</button>
-            <!--
-            <button type="button" class="btn btn-primary" onclick="document.location.href='/config/download?arquivo=sb'">script Download</button>
-            <button type="button" class="btn btn-primary" onclick="document.location.href='/config/download?arquivo=xml'">XML Download</button>
-                -->
-        </div>
-    </div>
-    <hr>
-</div>
-
-
-
-
-<div class="container-fluid">
-
-    <div class="mb-4 mt-4">
-        <form action="{% url 'set_ip' %}" method="POST" >
-        <label>DXM Endereço:</label>
-        <div class="form-inline">
-            {% csrf_token %}
-            <input type="text" id="endress" name="valor" value="{{dados.DXM_Endress}}" class="mr-3 form-control" />
-            <button id="splint" class="btn btn-primary" type="submit" onclick="altIp()">
-                Salvar
-            </button>
-        </div>
-        </form>
-    </div>
-    {% if dados.DXM_Status == 'DXM OnLine' %}
-        <div class="mb-4  mt-4">
-            <form action="{% url 'set_linhas' %}" method="POST" >
-            <label for="linhas">linhas:</label>
-            <div class="form-inline">
-                {% csrf_token %}
-                <input type="number" class="mr-3 form-control" name="valor" id="linhas" value="{{dados.quantidade}}" />
-                <button id="splint2" class="btn btn-primary " onclick="linhaAltera()" type="submit">Alterar</button>
+<div id="app">
+    <main_menu></main_menu>   
+    <b-container fluid>
+        <div class="card-title mt-5 mb-3 pt-3">
+            <div class="row">
+                <div class="col text-left"><h2>Configuração do DXM</h2></div>    
+                <div class="col-auto text-right">
+                    <b-button-group size="sm">
+                        <b-button disabled variant="primary">Rede</b-button>
+                        <b-button variant="primary">Turno</b-button>
+                        <b-button variant="primary">Mapa IO</b-button>
+                        <b-button variant="primary">Programar</b-button>
+                        <b-button variant="primary">Destravar</b-button>
+                    </b-button-group>
+                </div>
             </div>
-            </form>
-        </div>
-
-        <div class="mb-4  mt-4">
-            <form action="{% url 'set_tickLog' %}" method="POST">
-            <label for="tickLog">intervalo entre logs(min)</label>
-            <div class="form-inline">
-                {% csrf_token %}
-                <input type="number" class="mr-3 form-control" name="valor" id="tickLog" value="{{dados.tickLog}}" />
-                <button id="bAltLog" class="btn btn-primary" type="submit" onclick="altLog()">Alterar</button>
-            </div>
-        </form>
-        </div>
-        <hr />
-        
-        
-        {% for l in dados.linhas %}
-        <form action="/config/set_dados/{{l.id}}" method="POST">
-            <div class="mb-4 mt-4 form-row">
-                    {% csrf_token %}
-                <div class="col-auto mt-3">
-                    <p>Nome linha {{l.id}} : </p>
-                    <input type="text" id="l {{l.id}}" name="nome" value="{{l.nome}}" class="mr-3 form-control" />
-                </div>
-                <div class="col-auto mt-3">
-                    <p>Parada Agendado:</p>
-                    <input id="{{l.id}} age" name="agendado" type="time" class="form-control text-center mr-3">
-                </div>
-                <div class="col-auto mt-3">
-                    <p>Forma de Contagem:</p>
-                    {% if l.forma == 0 %}
-                    
-                        <select class="form-control mr-3" id="{{l.id}} forma" name="forma">
-                            <option value="0" selected="selected">Contador de rejeitados</option>
-                            <option value="1">Contador de Aprovados</option>
-                        </select>
-                    {% else %}
-                        <select class="form-control mr-3" id="{{l.id}} forma" name="forma">
-                            <option value="0">Contador de rejeitados</option>
-                            <option value="1" selected="selected">Contador de Aprovados</option>
-                        </select>
-                    {% endif %}
-
-                </div>
-                <div class="col-auto mt-3">
-                    <p>Veloc. Esperada (p/m):</p>
-                    <input id="{{l.id}} velo_esp" name="vel_esp" type="text" class="form-control text-center mr-3" value="{{l.vel_esp}}" />
-                </div>
-                <div class="col-auto mt-3">
-                    <p>ação:</p>
-                    <button id="{{l.id}}salva" class="btn btn-primary" type="submit" onclick="salva({{l.id}})" >Salvar </button>
-                    <button class="btn btn-danger" type="button" onclick="zera({{l.id}})">Zerar</button>
-                </div>
             
-            </div>
-        </form>
-            <hr />
-        {% endfor %}
-
-        <div class="mb-4 mt-4">
-            <label class="mr-3">Emulador: </label>
-            {% if dados.emulador == 0 %}
-                <button class="btn btn-primary" onclick="emula({{dados.emulador}})" type="button">
-                    <span id="emul" onclick="emula({{dados.emulador}})">Iniciar emulador</span>
-                </button>
-            {% else %}
-                <button class="btn btn-danger" onclick="emula({{dados.emulador}})" type="button">
-                    <span id="emul" onclick="emula({{dados.emulador}})">Parar emulador</span>
-                </button>
-            {% endif %}
         </div>
-
-    {% endif %}
-
+        <hr>
+        <div class="container-fluid row m-auto">
+            conteudo
+        </div>
+    </b-container>
 </div>
-
-
 
 <script>
-    var timers = []
-
-    function altIp() {
-        document.getElementById("splint").innerHTML = "<span class=\"spinner-border spinner-border-sm mr-1\"></span>Alterando...";
-
-    }
-
-    function altLog(){
-        document.getElementById("bAltLog").innerHTML = "<span class=\"spinner-border spinner-border-sm mr-1\"></span>Alterando...";
-    }
-
-    function salva(valor){
-        document.getElementById(`${valor}salva`).innerHTML ="<span class=\"spinner-border spinner-border-sm mr-1\"></span>Alterando...";
-    }
-
-    function zera(valor) {
-        var xhp = new XMLHttpRequest()
-
-        xhp.onreadystatechange = function () {
-            if (this.readyState === 4 && this.status === 200) {
-                var re = this.responseText
-                if (re == "ok") { toastr.success("contador Zerados", "Sucesso") }
-                else { toastr.error("não foi possível zerar Contador", "Falha") }
-            }
-        }
-        xhp.open("Get", `/config/zerar_linha/${valor}`);
-        xhp.send();
-    }
-
-    function linhaAltera() {
-        document.getElementById("splint2").innerHTML = "<span class=\"spinner-border spinner-border-sm mr-1\"></span>Alterando...";
-    }
-   
-    function emula(valor) {
-        if (valor == 0) {
-            valor = 1
-        }
-        else {
-            valor = 0
-        }
-
-        var xhp = new XMLHttpRequest()
-        xhp.onreadystatechange = function () {
-        if (this.readyState === 4 && this.status === 200) {
-            var re = this.responseText
-            setTimeout(document.location.reload(), 2000)
-        }
-        }
-        xhp.open("Get", "/config/emula/" + valor);
-        xhp.send();
-    }
-    
-        {% for l in dados.linhas %}
-            timers.push({{l.t_p_prog}})
-        {% endfor %}
-        for (x=0;x<timers.length;x++){
-            h = `${Math.floor(timers[x]/60)}`
-            if (h.length<2){
-                h = `0${h}`
-            }
-            m = `${timers[x]%60}`
-            if (m.length<2){
-                m = `0${m}`
-            }
-            document.getElementById(`${x} age`).value = `${h}:${m}`
-        }
-    
-        
-        {% if msg == 'executado' %}
-        setTimeout( function(){
-            toastr.success("Ação executada", "Sucesso")
-        },100)
-        {% endif %}
-        {% if msg == 'falha' %}
-        setTimeout(function(){
-            toastr.error("não foi possível executar a ação", "Falha")
-        },100)
-        {% endif %}
-
+    var app = new Vue({
+        delimiters: ["[[", "]]"],
+        el:'#app',
+        created(){
+        },
+        data:{
+        },
+        computed:{              
+        },
+        methods:{
+        },
+    })
 </script>
 
 {% endblock %}
