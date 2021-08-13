@@ -22,7 +22,19 @@
         </div>
         <hr>
         <div class="container-fluid row m-auto">
-            conteudo index
+            <div>
+                <label>DXM Endereço:</label>
+                <b-input-group>
+                    <b-form-input
+                        :state=Ipcheck()
+                        v-model="dxmIp"
+                        type="text"
+                        autocomplete="off"
+                        placeholder="Ip: xx.xx.xx.xx"
+                    ></b-form-input>
+                    <b-button variant="primary">Alterar</b-button>
+                </b-input-group>
+            </div>
         </div>
     </b-container>
 </div>
@@ -34,8 +46,14 @@
         created(){
         },
         data:{
+            dxmIp: "",
         },
-        computed:{              
+        computed:{  
+            Ipcheck(){
+                let buffer = this.Ipcheck.split(".")
+                if(buffer.length ===4 ){return true}
+                else{return false}
+            }            
         },
         methods:{
         },

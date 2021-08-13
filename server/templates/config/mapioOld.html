@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block context %}
+
+<style>
+    input {
+        max-width: 100px;
+        max-height:30px;
+        min-width:60px;
+    }
+    label{
+        margin-right:5px;
+    }
+</style>
+
+<div class="card-title mt-5 mb-3 pt-3">
+    <div class="row mb-5">
+        <div class="col text-left">
+            <h2>Configuração do Mapa I/O</h2>
+        </div>
+        <div class="col-auto text-right btn-group">
+            <button type="button" class="btn btn-primary" onclick="document.location.href='/config/'">Rede</button>
+            <button type="button" class="btn btn-primary " onclick="document.location.href='/config/turno'">Turno</button>
+            <button type="button" class="btn btn-primary disabled" onclick="document.location.href='/config/mapio'">Mapa I/O</button>
+            <button type="button" class="btn btn-primary" onclick="document.location.href='/config/dxmconfig'">Programar</button>
+            <button type="button" class="btn btn-primary  " onclick="document.location.href='/config/reset'">Destravar</button>
+        </div>
+    </div>
+    <hr>
+    <div>
+        <form action="{% url 'map_alt_modo' %}" method="POST" id="modo_form">
+            {% csrf_token %}
+        <select id="modo" name="modo" class="form-control m-auto text-center" style="max-width: 300px;" onchange="modoAlt()">
+        {% if modo == 0 %}
+            <option value="0" selected>SureCross</option>
+            <option value="1">Multi-Hop</option>
+        {% else %}
+            <option value="0" >SureCross</option>
+            <option value="1" selected>Multi-Hop</option>
+        {% endif %}
+        </select>
+        </form>
+    </div>
+</div>
+
+
+
+
+<div class="container-fluid">
+    {% for l in dados %}
+    <div class="p-2 m-auto" style="max-width:1000px">
+        <table class="table">
+                <thead>
+                    <tr class="bg-dark text-light">
+                        <td> {{l.nome }}</td>
+                    {% if modo == 0 %}
+                        <td>Node:</td>
+                        <td>Input:</td>
+                    {% else %}
+                        <td>ID:</td>
+                        <td>Reg (40x):</td>
+                    {% endif %}
+                        <td>ciclo(ms):</td>
+                        <td>DW/Inv:</td>
+                        <td>Usar:</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in l.regList %}
+                    <tr>
+                        <td>
+                            <label>{{r.nome}}:</label>
+                        </td>
+                        <td>
+                            <input id="{{l.id}}{{r.id}}slID" type="number" class="form-control" />
+                        </td>
+                        <td>
+                            <input id="{{l.id}}{{r.id}}reg" type="number" class="form-control" />
+                        </td>
+                        <td>
+                            <input id="{{l.id}}{{r.id}}ciclo" type="number" class="form-control" value="{{r.ciclo}}" />
+                        </td>
+                        <td>
+                            {% if r.dword == '2' %}
+                                <!--<input {% if r.id == 2 %}disabled{% endif %}  id="{{l.id}}{{r.id}}dword" type="checkbox" class="form-check" checked />-->
+                                <input id="{{l.id}}{{r.id}}dword" type="checkbox" class="form-check" checked />
+                            {% else %}
+                                <!--<input {% if r.id == 2 %}disabled{% endif %}  id="{{l.id}}{{r.id}}dword" type="checkbox" class="form-check" />-->
+                                <input id="{{l.id}}{{r.id}}dword" type="checkbox" class="form-check" />
+                            {% endif %}
+
+                        </td>
+                        <td>
+                            {% if r.ativo %}
+                                <input id="{{l.id}}{{r.id}}ativo" type="checkbox" class="form-check" checked />
+                            {% else %}
+                                <input id="{{l.id}}{{r.id}}ativo" type="checkbox" class="form-check" />
+                            {% endif %}
+
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+    </div>
+    {% endfor %}
+    <div class="p-2 m-auto">
+        <form action="{% url 'map_io' %}" method="POST" id="form_json">
+            {% csrf_token %}
+            <input type="hidden" name="json" id="id_json">
+        </form>
+        <div class="m-auto" style="max-width:100px">
+            <button type="button" class="btn btn-block btn-success" onclick="enviar()" >Salvar</button>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    
+
+        var js = '{{json}}'
+        js = js.replace(/&quot;/gi,'\"')
+        var data = JSON.parse(js)
+        var modo = '{{modo}}'
+
+    function enviar() {
+        for (x =0 ; x<data.length ; x++ ){
+            for (y=0;y<3;y++){
+                if(modo == '0'){
+                    data[x].regList[y].slaveID = 1
+                    var ms = document.getElementById(`${x}${y}slID`).value*1
+                    var ls = document.getElementById(`${x}${y}reg`).value*1
+                    data[x].regList[y].reg = (ms*16)+ls
+                }
+                else{
+                    var ms = document.getElementById(`${x}${y}slID`).value*1
+                    var ls = document.getElementById(`${x}${y}reg`).value*1
+                    data[x].regList[y].slaveID = 1*ms
+                    data[x].regList[y].reg = 1*ls
+                }
+                var cic = document.getElementById(`${x}${y}ciclo`).value
+                data[x].regList[y].ciclo = cic*1
+                if (document.getElementById(`${x}${y}dword`).checked) { data[x].regList[y].dword = '2' }
+                else { data[x].regList[y].dword = '1' }
+                if (document.getElementById(`${x}${y}ativo`).checked) { data[x].regList[y].ativo = true }
+                else { data[x].regList[y].ativo = false }
+            }
+        }
+
+        document.getElementById('id_json').value = JSON.stringify(data)
+        document.getElementById('form_json').submit()
+    }
+
+    function modoAlt(){
+        document.getElementById('modo_form').submit()
+    }
+
+    function loadinfo(){
+        for (x =0 ; x<data.length ; x++ ){
+            for (y=0;y<3;y++){
+                if(modo == '0'){
+                    document.getElementById(`${x}${y}slID`).value = Math.floor(data[x].regList[y].reg/16)
+                    document.getElementById(`${x}${y}reg`).value = data[x].regList[y].reg%16
+                    data[x].regList[y].slaveID = 1
+                }
+                else{
+                    document.getElementById(`${x}${y}slID`).value = data[x].regList[y].slaveID
+                    document.getElementById(`${x}${y}reg`).value = data[x].regList[y].reg
+                }
+            }
+            
+        }
+    }
+
+    
+     loadinfo()
+    
+
+        {% if msg == 'executado' %}
+        setTimeout( function(){
+            toastr.success("Ação executada", "Sucesso")
+        },100)
+        {% endif %}
+        {% if msg == 'falha' %}
+        setTimeout(function(){
+            toastr.error("não foi possível executar a ação", "Falha")
+        },100)
+        {% endif %}
+
+</script>
+
+{% endblock %}

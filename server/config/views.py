@@ -81,12 +81,14 @@ class DxmConfigView(View):
 
 class ResetView(View):
     def get(self,request):
-        dxm = Protocolo(servico.oee.DXM_Endress)
+        #dxm = Protocolo(servico.oee.DXM_Endress)
         estado = 'Bloqueado'
+        """        
         if dxm.fileExist('OEE.sb'):
             estado = 'Bloqueado'
         else:
             estado = 'Desbloqueado'
+        """
         return render(request,'config/reset.html',context={
             'estado':estado
         })

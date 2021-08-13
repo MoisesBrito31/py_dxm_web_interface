@@ -2,140 +2,44 @@
 {% load static %}
 {% block context %}
 
-
-<div class="card-title mt-5 mb-3 pt-3">
-    <div class="row mb-5">
-        <div class="col text-left">
-            <h2>Ajuste dos turnos</h2>
+<div id="app">
+    <main_menu></main_menu>   
+    <b-container fluid>
+        <div class="card-title mt-5 mb-3 pt-3">
+            <div class="row">
+                <div class="col text-left"><h2>Ajuste dos turnos</h2></div>    
+                <div class="col-auto text-right">
+                    <b-button-group size="sm">
+                        <b-button  href="/config" variant="primary">Rede</b-button>
+                        <b-button disabled href="/config/turno" variant="primary">Turno</b-button>
+                        <b-button href="/config/mapio" variant="primary">Mapa IO</b-button>
+                        <b-button href="/config/dxmconfig" variant="primary">Programar</b-button>
+                        <b-button href="/config/reset" variant="primary">Destravar</b-button>
+                    </b-button-group>
+                </div>
+            </div>
+            
         </div>
-        <div class="col-auto text-right btn-group">
-            <button type="button" class="btn btn-primary" onclick="document.location.href='/config/'">Rede</button>
-            <button type="button" class="btn btn-primary disabled" onclick="document.location.href='/config/turno'">Turno</button>
-            <button type="button" class="btn btn-primary " onclick="document.location.href='/config/mapio'">Mapa I/O</button>
-            <button type="button" class="btn btn-primary" onclick="document.location.href='/config/dxmconfig'">Programar</button>
-            <button type="button" class="btn btn-primary" onclick="document.location.href='/config/reset'">Destravar</button>
+        <hr>
+        <div class="container-fluid row m-auto">
+            conteudo turnos
         </div>
-    </div>
+    </b-container>
 </div>
 
-<div class="m-auto mt-5 form-inline form-group">
-    <label>Relógio do DXM:</label>
-    <input type="text" class="form-control mr-3 ml-3" id="relogio" readonly />
-    <button type="button" class="btn btn-primary mr-3" onclick="getRelogio()">Ler</button>
-    <button type="button" class="btn btn-primary" onclick="setRelogio()">Ajustar</button>
-</div>
-
-<hr>
-
-
-<div class="container-fluid">
-    <div class="p-2 m-auto" style="max-width:800px">
-        <table class="table">
-            <thead>
-                <tr class="bg-dark text-light">
-                    <th>turno:</th>
-                    <th>horário de início:</th>
-                    <th>Ação:</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for t in dados %}
-                <tr>
-                    <form action="/config/editTurno/{{t.id}}" method="POST">
-                        {% csrf_token %}
-                    <td><input id="{{t.id}} nome" name="nome" type="text" class="form-control" value="{{ t.nome }}"/></td>
-                    <td><input id="{{t.id}} time" name="time" type="time" class="form-control" /></td>                    
-                    <td class="form-inline">
-                        <button type="submit" class="btn btn-primary mr-3">Salvar</button>
-                    </form>   
-                        <form action="/config/deletaTurno/{{t.id}}" method="POST">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-danger">Apagar</button>
-                        </form>
-                    </td>
-                </tr>
-                {% endfor %}
-                <tr>
-                    <form action="{% url 'add_turno' %}" method="POST" >
-                        {% csrf_token %}
-                        <input type="hidden" id="index" name="index" />
-                    <td><input id="nome" name="nome" type="text" class="form-control" /></td>
-                    <td><input id="time" name="time" type="time" class="form-control" /></td>
-                    <td>
-                        <button type="submit" class="btn btn-primary mr-3" >Salvar</button>
-                    </td>
-                    </form>
-                </tr>
-            </tbody>
-        </table>
-        </div>
-    </div>
-
-    <script type="text/javascript">
-        var relogio = document.getElementById("relogio")
-        function getRelogio() {
-            var xhp = new XMLHttpRequest()
-            xhp.onreadystatechange = function () {
-                if (this.readyState === 4 && this.status === 200) {
-                    var re = this.responseText
-                    //alert(re);
-                    if (re == "falha") {
-                        toastr.error("Falha do processo, tente novamente", "Erro")
-
-                    }
-                    else {
-                        relogio.value = re
-                        toastr.success("ação bem sucedida", "sucesso")
-                    }
-                }
-            }
-            xhp.open("Get", "/config/getRelogio");
-            xhp.send();
-        }
-
-        function setRelogio() {
-            var xhp = new XMLHttpRequest()
-            xhp.onreadystatechange = function () {
-                if (this.readyState === 4 && this.status === 200) {
-                    var re = this.responseText
-                    //alert(re);
-                    if (re == "ok") {
-                        toastr.success("ação bem sucedida", "sucesso")
-                    }
-                    else {
-                        toastr.error("Falha do processo, tente novamente", "Erro")
-                    }
-                }
-            }
-            xhp.open("Get", "/config/setRelogio");
-            xhp.send();
-        }
-
-        var timers = []
-        {% for t in dados %}
-            timers.push("{{t.start}}")
-        {% endfor %}
-   
-        document.getElementById('index').value = 0
-        for(x=0;x<timers.length;x++){
-            temp = timers[x].split(' ')
-            timers[x]=temp[temp.length-1]
-            document.getElementById(`${x} time`).value = timers[x]
-            document.getElementById('index').value = x+1
-        }
-        
-
-        {% if msg == 'executado' %}
-        setTimeout( function(){
-            toastr.success("Ação executada", "Sucesso")
-        },200)
-        {% endif %}
-        {% if msg == 'falha' %}
-        setTimeout(function(){
-            toastr.error("não foi possível executar a ação", "Falha")
-        },200)
-        {% endif %}
-
-    </script>
+<script>
+    var app = new Vue({
+        delimiters: ["[[", "]]"],
+        el:'#app',
+        created(){
+        },
+        data:{
+        },
+        computed:{              
+        },
+        methods:{
+        },
+    })
+</script>
 
 {% endblock %}
