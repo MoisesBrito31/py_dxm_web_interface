@@ -2,6 +2,7 @@
 .vscode
 __pycache__
 venv
+pacotes npm
 base.mapa
 file.dat
 OEE.data

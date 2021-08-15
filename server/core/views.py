@@ -1,5 +1,6 @@
 import datetime
 import json
+from django.middleware.csrf import get_token
 from django.http.response import HttpResponse, JsonResponse
 from django.views.generic import View
 from django.shortcuts import render, HttpResponseRedirect, redirect
@@ -153,7 +154,9 @@ class LoginView(View):
 
     def get(self, request):
         self.context['msg'] = 'ok'
-        return render(request, 'login.html', self.context)
+        response = render(request, 'login.html', self.context)
+        set_cookie(response,"csrftoken",get_token(request))
+        return response
 
     def post(self, request):
         try:

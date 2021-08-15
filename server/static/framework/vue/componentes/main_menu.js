@@ -67,6 +67,12 @@ Vue.component('main_menu',{
         }
         return cookieValue;
       },
+      setCookie(cname, cvalue, exdays) {
+        var d = new Date();
+        d.setTime(d.getTime() + (exdays*24*60*60*1000));
+        var expires = "expires="+ d.toUTCString();
+        document.cookie = cname + "=" + cvalue + "; " + expires;
+      },
       load(){
         this.readData()
       },
@@ -81,8 +87,8 @@ Vue.component('main_menu',{
                 return res.text()
             }
         }).then(result=>{
-             //console.log(result)
              this.data = JSON.parse(result)
+             this.setCookie("dxm_online",this.data.dxm_online,7)
              this.erro= false
         }).catch(erro=>{
             console.log(erro)

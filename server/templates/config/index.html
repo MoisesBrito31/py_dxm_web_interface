@@ -2,6 +2,12 @@
 {% load static %}
 {% block context %}
 
+
+<script src="{%static 'framework/jquery/jquery.js'%}"></script>
+<link type="text/css" rel="stylesheet" href="{% static 'framework/animate/animate.css' %}" />
+<link type="text/css" rel="stylesheet" href="{% static 'framework/toastr/toastr.css' %}" />
+<script src="{%static 'framework/toastr/toastr.min.js'%}"></script>
+
 <div id="app">
     <main_menu></main_menu>   
     <b-container fluid>
@@ -13,8 +19,8 @@
                         <b-button  disabled variant="primary">Rede</b-button>
                         <b-button href="/config/turno" variant="primary">Turno</b-button>
                         <b-button href="/config/mapio" variant="primary">Mapa IO</b-button>
-                        <b-button href="/config/dxmconfig" variant="primary">Programar</b-button>
-                        <b-button href="/config/reset" variant="primary">Destravar</b-button>
+                        <b-button v-bind:disabled="!dxmOnline" href="/config/dxmconfig" variant="primary">Programar</b-button>
+                        <b-button v-bind:disabled="!dxmOnline" href="/config/reset" variant="primary">Destravar</b-button>
                     </b-button-group>
                 </div>
             </div>
@@ -26,14 +32,74 @@
                 <label>DXM Endereço:</label>
                 <b-input-group>
                     <b-form-input
-                        :state=Ipcheck()
+                        :state="Ipcheck"
                         v-model="dxmIp"
                         type="text"
                         autocomplete="off"
                         placeholder="Ip: xx.xx.xx.xx"
+                        area-invalid="Ip-falha"
                     ></b-form-input>
-                    <b-button variant="primary">Alterar</b-button>
+                    <b-button v-bind:disabled="!Ipcheck" variant="primary" 
+                    @click="postSetIp">
+                    <div v-if="ipAlterando" class="animate__animated animate__pulse animate__infinite">
+                        <b-spinner small type="grow"></b-spinner>
+                        alterando...
+                    </div>
+                    <div v-else="ipAlterando">Alterar</div>
+                    </b-button>
+                    <b-form-invalid-feedback id="Ip-falha">
+                        Informe um endereço ip valido
+                    </b-form-invalid-feedback>
                 </b-input-group>
+            </div>
+            <div v-show="dxmOnline">
+                <div>
+                    <label>Linhas:</label>
+                    <b-input-group>
+                        <b-form-input
+                            :state="LinhasCheck"
+                            v-model="linhas"
+                            type="number"
+                            min=1
+                            max=46
+                            autocomplete="off"
+                            area-invalid="Linhas-falha"
+                        ></b-form-input>
+                        <b-button v-bind:disabled="!LinhasCheck" variant="primary" 
+                        @click="postSetLinhas">
+                        <div v-if="linhasAlterando" class="animate__animated animate__pulse animate__infinite">
+                            <b-spinner small type="grow"></b-spinner>
+                            alterando...
+                        </div>
+                        <div v-else="linhasAlterando">Alterar</div></b-button>
+                        <b-form-invalid-feedback id="Linhas-falha">
+                            1 - 46
+                        </b-form-invalid-feedback>
+                    </b-input-group>
+                </div>
+                <div>
+                    <label>intervalo entre logs(min):</label>
+                    <b-input-group>
+                        <b-form-input
+                            :state="LogCheck"
+                            v-model="log"
+                            type="number"
+                            min=1
+                            autocomplete="off"
+                            area-invalid="log-falha"
+                        ></b-form-input>
+                        <b-button v-bind:disabled="!LogCheck" variant="primary" 
+                        @click="postSetLog">
+                        <div v-if="logAlterando" class="animate__animated animate__pulse animate__infinite">
+                            <b-spinner small type="grow"></b-spinner>
+                            alterando...
+                        </div>
+                        <div v-else="logAlterando">Alterar</div></b-button>
+                        <b-form-invalid-feedback id="log-falha">
+                            número maior que Zero
+                        </b-form-invalid-feedback>
+                    </b-input-group>
+                </div>
             </div>
         </div>
     </b-container>
@@ -44,18 +110,118 @@
         delimiters: ["[[", "]]"],
         el:'#app',
         created(){
+            this.dxmDisponivel()
+            setInterval(()=>{
+                this.dxmDisponivel()
+            },2000)
         },
         data:{
-            dxmIp: "",
+            dxmIp: "{{dados.DXM_Endress}}",
+            dxmOnline: false,
+            ipAlterando: false,
+            linhas: parseInt("{{dados.quantidade}}"),
+            linhasAlterando: false,
+            log: parseInt("{{dados.tickLog}}"),
+            logAlterando: false,
         },
         computed:{  
             Ipcheck(){
-                let buffer = this.Ipcheck.split(".")
-                if(buffer.length ===4 ){return true}
+                let buffer = []
+                try {
+                    buffer = this.dxmIp.split('.')
+                               
+                if(buffer.length ===4 ){
+                    if (parseInt(buffer[0])>=0 && parseInt(buffer[0])<255 && buffer[0]!=""){
+                        if (parseInt(buffer[1]) >=0 && parseInt(buffer[1])<255 && buffer[1]!=""){
+                            if (parseInt(buffer[2]) >=0 && parseInt(buffer[2])<255 && buffer[2]!=""){
+                                if (parseInt(buffer[3]) >=0 && parseInt(buffer[3])<255 && buffer[3]!=""){
+                                    return true
+                                }
+                            }
+                        }
+                    }
+                    return false
+                }
                 else{return false}
-            }            
+                }catch{return false} 
+            },                     
+            LinhasCheck(){
+                if(this.linhas>0 && this.linhas<47){return true}
+                else{return false}
+            },
+            LogCheck(){
+                if(this.log>0){return true}
+                else{return false}
+            },
         },
         methods:{
+            postSetIp(){
+                this.ipAlterando = true
+                let form = new FormData()
+                form.append("valor",this.dxmIp)
+                this.post("{% url 'set_ip' %}",form).then(ret=>{
+                    this.ipAlterando = false
+                })
+            },
+            postSetLinhas(){
+                this.linhasAlterando = true
+                let form = new FormData()
+                form.append("valor",this.linhas)
+                this.post("{% url 'set_linhas' %}",form).then(ret=>{
+                    this.linhasAlterando = false
+                })
+            },
+            postSetLog(){
+                this.logAlterando = true
+                let form = new FormData()
+                form.append("valor",this.log)
+                this.post("{% url 'set_tickLog' %}",form).then(ret=>{
+                    this.logAlterando = false
+                })
+            },
+            async post(url,form){
+                let ret = await fetch(url,{
+                    method: "post",
+                    headers:{'X-CSRFToken': this.getCookie('csrftoken'),},
+                    body: form
+                }).then(res=>{
+                    if(res.status==200){
+                        return res.text()
+                    }else{
+                        toastr.error(`servidor retornou um codigo ${res.status}`,"Erro no Servidor")
+                        return false
+                    }
+                }).then(data=>{
+                    if(data=="ok"){
+                        toastr.success("Informação salva no servidor","Sucesso")
+                        return true
+                    }
+                    else{
+                        toastr.error(data,"Erro no Processamento")
+                        return false
+                    }
+                })
+                return ret
+            },
+            getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        // Does this cookie string begin with the name we want?
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            },
+            dxmDisponivel(){
+                if(this.getCookie("dxm_online")=="True"){this.dxmOnline= true}
+                else{this.dxmOnline=  false}
+            }   
         },
     })
 </script>

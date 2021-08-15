@@ -95,9 +95,12 @@ class ResetView(View):
 
 class MapAltModo(View):
     def post(self,request):
-        m = int(request.POST['modo'])
-        servico.mapa.modo = m
-        return redirect('/config/mapio')
+        try:
+            m = int(request.POST['modo'])
+            servico.mapa.modo = m
+            return HttpResponse('ok')
+        except Exception as ex:
+            return HttpResponse(f'falha no processamento - {str(ex)}')
 
 class AddTurno(View):
     def post(self,request):
@@ -111,9 +114,9 @@ class AddTurno(View):
             e = Evento(nome,time,id=index)
             servico.mapa.turnos.append(e)
             servico.mapa.salva()
-            return logado('config/turno.html',request,titulo='Turnos', msg='executado', dados=servico.mapa.turnos)
-        except:
-            return logado('config/turno.html',request,titulo='Turnos', msg='falha', dados=servico.mapa.turnos)
+            return HttpResponse('ok')
+        except Exception as ex:
+            return HttpResponse(f'falha no processamento - {str(ex)}')
 
 class DeleteTurno(View):
     def post(self,request,value):
@@ -122,9 +125,9 @@ class DeleteTurno(View):
             for x in range(len(servico.mapa.turnos)):
                 servico.mapa.turnos[x].id = x
             servico.mapa.salva()
-            return logado('config/turno.html',request,titulo='Turnos', msg='executado', dados=servico.mapa.turnos)
-        except:
-            return logado('config/turno.html',request,titulo='Turnos', msg='falha', dados=servico.mapa.turnos)
+            return HttpResponse('ok')
+        except Exception as ex:
+            return HttpResponse(f'falha no processamento - {str(ex)}')
 
 class EditTurno(View):
     def post(self,request,value):
@@ -137,29 +140,36 @@ class EditTurno(View):
             servico.mapa.turnos[value].nome = nome
             servico.mapa.turnos[value].start = time
             servico.mapa.salva()
-            return logado('config/turno.html',request,titulo='Turnos', msg='executado', dados=servico.mapa.turnos)
-        except:
-            return logado('config/turno.html',request,titulo='Turnos', msg='falha', dados=servico.mapa.turnos)
+            return HttpResponse('ok')
+        except Exception as ex:
+            return HttpResponse(f'falha no processamento - {str(ex)}')
 
 class Set_ip(View):
     def post(self,request):
-        valor = str(request.POST['valor'])
-        servico.oee.DXM_Endress = valor
-        servico.close()
-        servico._setupTCP()
-        sleep(3)
-        return redirect('/config')
+        try:
+            valor = str(request.POST['valor'])
+            servico.oee.DXM_Endress = valor
+            servico.close()
+            servico._setupTCP()
+            sleep(2)
+            return HttpResponse('ok')
+        except Exception as ex:
+            return HttpResponse(f'falha no processamento - {str(ex)}')
 
 class Set_linhas(View):
     def post(self,request):
-        valor = int(request.POST['valor'])
-        while servico.dxm.read_holding_registers(89,1)[0] != valor:
-            servico.dxm.write_multiple_registers(89,[valor])
-            sleep(2)
-        sleep(3)
-        scr = Script(servico.oee.linhas,servico.mapa,servico.oee.tickLog)
-        scr.salvaArquivo()
-        return redirect('/config')
+        try:
+            valor = int(request.POST['valor'])
+            while servico.dxm.read_holding_registers(89,1)[0] != valor:
+                servico.dxm.write_multiple_registers(89,[valor])
+                sleep(2)
+            sleep(3)
+            scr = Script(servico.oee.linhas,servico.mapa,servico.oee.tickLog)
+            scr.salvaArquivo()
+            return HttpResponse('ok')
+        except Exception as ex:
+            return HttpResponse(f'falha no processamento - {str(ex)}')
+
 
 class Set_dados(View):
     def post(self,request,valor):
@@ -183,20 +193,23 @@ class Set_dados(View):
                 servico.mapa.blocos[x].nome = servico.oee.linhas[x].nome
             servico.oee.salva()
             servico.mapa.salva()
-            return logado('config/index.html',request,titulo='configurar DXM', msg='executado', dados=servico.oee)
-        except:
-            return logado('config/index.html',request,titulo='configurar DXM', msg='falha', dados=servico.oee)
+            return HttpResponse('ok')
+        except Exception as ex:
+            return HttpResponse(f'falha no processamento - {str(ex)}')
 
 class Set_tickLog(View):
     def post(self,request):
-        valor = int(request.POST['valor'])
-        servico.oee.tickLog = valor
-        servico.oee.salva()
-        sleep(3)
-        print(len(servico.oee.linhas))
-        scr = Script(servico.oee.linhas,servico.mapa,valor)
-        scr.salvaArquivo()
-        return redirect('/config')
+        try:
+            valor = int(request.POST['valor'])
+            servico.oee.tickLog = valor
+            servico.oee.salva()
+            sleep(3)
+            print(len(servico.oee.linhas))
+            scr = Script(servico.oee.linhas,servico.mapa,valor)
+            scr.salvaArquivo()
+            return HttpResponse('ok')
+        except Exception as ex:
+            return HttpResponse(f'falha no processamento - {str(ex)}')
 
 def emula(request,valor):
     if UserPermission(request,nivel_min=1):
