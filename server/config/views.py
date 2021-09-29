@@ -81,12 +81,15 @@ class DxmConfigView(View):
 
 class ResetView(View):
     def get(self,request):
-        dxm = Protocolo(servico.oee.DXM_Endress)
-        estado = 'Bloqueado'
-        if dxm.fileExist('OEE.sb'):
+        try:
+            dxm = Protocolo(servico.oee.DXM_Endress)
             estado = 'Bloqueado'
-        else:
-            estado = 'Desbloqueado'
+            if dxm.fileExist('OEE.sb'):
+                estado = 'Bloqueado'
+            else:
+                estado = 'Desbloqueado'
+        except:
+            estado = "Falha de leitura"
         return render(request,'config/reset.html',context={
             'estado':estado
         })
@@ -181,6 +184,9 @@ class Set_dados(View):
                 servico.mapa.blocos[x].nome = servico.oee.linhas[x].nome
             servico.oee.salva()
             servico.mapa.salva()
+            scr = Script(servico.oee.linhas,servico.mapa,servico.oee.tickLog)
+            scr.salvaArquivo()
+            sleep(1)
             return logado('config/index.html',request,titulo='configurar DXM', msg='executado', dados=servico.oee)
         except:
             return logado('config/index.html',request,titulo='configurar DXM', msg='falha', dados=servico.oee)
