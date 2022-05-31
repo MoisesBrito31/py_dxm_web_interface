@@ -1,6 +1,6 @@
 import socket
 from datetime import datetime, timedelta
-from libscrc import modbus as crc_modbus
+import crcmod
 from time import sleep
 
 class Protocolo():
@@ -237,7 +237,8 @@ class Protocolo():
 
     def _crc16(self,dados):
         b = bytes(dados,'ASCII')
-        valor= str(hex(crc_modbus(b))).upper()[2:]
+        crc16 = crcmod.mkCrcFun(0x18005, initCrc=0xFFFF, xorOut=0x0000)
+        valor= str(hex(crc16(b))).upper()[2:]
         while len(valor)<4:
             valor=f'0{valor}'
         hi = valor[2:]
