@@ -1,16 +1,33 @@
 from django.shortcuts import render, HttpResponse
 from django.views.generic import View
-from core.views import logado, UserPermission
-from oee.models import Hist
+from core.views import logado, erro, UserPermission
+from oee.models import Hist, Linha, HistV
 from django.db.models import Q
 from dxm_oee_modulo.dxm import Servico, servico, Modbus
 from datetime import datetime, timedelta
 
+class ConjuntoView(View):
+    def get(self, request):
+        linhas = Linha.objects.all()
+        dado = []
+        for x in linhas:
+            dado.append(x)
+        print(f'{type(dado)}, {dado}')
+        return logado('oee/fabrica.html',request,dados=dado,titulo='Overview',nivel_min=3)
+
 class IndexView(View):
-    def get(self,request):
+    def get(self,request,valor):
+        banco = Linha.objects.get(index=valor)
+        qtd = 0
+        nome = banco.nome
         dados = servico.oee
+        for l in servico.oee.linhas:
+            if l.conjunto == valor:
+                qtd = qtd+1
         #dados=3
-        return logado('oee/index.html',request,dados=dados,titulo='Fabrica',nivel_min=3)
+        return logado('oee/index.html',request,dados=dados,titulo='Fabrica',nivel_min=3,context={'conjunto': int(valor),
+                                                                                                 'nome':nome,
+                                                                                                 'qtd':qtd})
 
 class LinhaView(View):
     def get(self,request,id):
@@ -74,6 +91,81 @@ class HistoricoView(View):
                             'ini': inis,
                             'fim': fims
                         },dados=dado,nivel_min=2)
+
+class GraficoVView(View):
+    def get(self,request,id):
+        nomeLinha = Linha.objects.get(index=id).nome
+        linhas = []
+        equipamentos = []
+        dados =[]
+        turno = ""
+        for l in servico.oee.linhas:
+            if l.conjunto == id:
+                linhas.append(l.id)
+                equipamentos.append(l.nome)
+        for eq in linhas:
+            leitura = HistV.objects.filter(equipamento=eq).first()
+            dados.append(leitura)
+        data = dados[0].data.time()
+        turnoh=[]
+        turnoList=[]
+        hmaisproximo = datetime.now()
+        for even in servico.mapa.turnos:
+            turnoList.append(even.nome)
+            turnoh.append(even.start)
+        hmaisproximo = min(turnoh,key=lambda h: abs(datetime.combine(datetime.min,h.time())-datetime.combine(datetime.min,data)))
+        print(turnoList)
+        for even in servico.mapa.turnos:
+            if even.start.time()==hmaisproximo.time():
+                turno = even.nome
+        return logado('oee/grafico_v.html',request=request,titulo=nomeLinha,dados=dados,nivel_min=2,context={
+            "conjunto":id,
+            "turno":turno,
+            "turnoList":turnoList,
+            "linha":nomeLinha,
+            "linhaIndex":id,
+            "data":dados[0].data,
+            "equipamentos":equipamentos
+        })
+    def post(self,request,id):
+        turnoList=[]
+        inis = str(request.POST['ini'])
+        turno = str(request.POST['turno'])
+        ini = datetime.strptime(inis,"%Y-%m-%d")
+        dataconsulta = datetime.now()
+        for eve in servico.mapa.turnos:
+            turnoList.append(eve.nome)
+            if eve.nome == turno:
+                dataconsulta = datetime.combine(ini.date(),eve.start.time())
+        consulIni = dataconsulta - timedelta(minutes=3)
+        consulFim = dataconsulta + timedelta(minutes=3)
+        print(f"ini: {consulIni} - hora: {ini} - fim: {consulFim}  - turno: {turno}")        
+        nomeLinha = Linha.objects.get(index=id).nome
+        linhas = []
+        equipamentos = []
+        dados =[]
+        for l in servico.oee.linhas:
+            if l.conjunto == id:
+                linhas.append(l.id)
+                equipamentos.append(l.nome)
+        for eq in linhas:
+            leitura = HistV.objects.filter(Q(equipamento__exact=eq) & Q(data__gt=consulIni) & Q(data__lt=consulFim)).order_by('data')
+            for l in leitura:
+                dados.append(l)
+        print(turnoList)
+        if dados:
+            return logado('oee/grafico_v.html',request=request,titulo=nomeLinha,dados=dados,nivel_min=2,context={
+                "conjunto":id,
+                "inis": inis,
+                "turno":turno,
+                "turnoList":turnoList,
+                "linha":nomeLinha,
+                "linhaIndex":id,
+                "data":dados[0].data,
+                "equipamentos":equipamentos
+            })
+        else:
+            return erro(request,msg="Erro ao acessar o bando de dados, retorno nulo",titulo="Erro no banco")
 
 def relatorio(request,inis,fims,valor):
     if UserPermission(request,nivel_min=2):
@@ -139,7 +231,7 @@ def conjunto_linhas(request):
     if UserPermission(request, 3):
         dado=''
         for l in servico.oee.linhas:
-            dado = f'{dado}{{\"nome\":\"{l.nome}\",\"estado\":\"{l.estado}\",\"oee\":{l.oee}}},'
+            dado = f'{dado}{{\"id\":{l.id},\"nome\":\"{l.nome}\",\"conjunto\":{l.conjunto},\"estado\":\"{l.estado}\",\"oee\":{l.oee}}},'
         dado = dado[0:len(dado)-1]
         return HttpResponse('['+dado+']')
     else:

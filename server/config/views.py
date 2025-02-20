@@ -1,7 +1,7 @@
 from django.shortcuts import render, HttpResponse, redirect
 from django.views.generic import View
 from core.views import logado, UserPermission
-from oee.models import Hist
+from oee.models import Hist, HistV
 from dxm_oee_modulo.dxm import servico, Modbus, Protocolo
 from dxm_oee_modulo.protocolo.mapa import Evento, Bloco, Reg
 from dxm_oee_modulo.oee_modulo.script import Script
@@ -169,10 +169,11 @@ class Set_dados(View):
             h = int(recb[0])
             m = int(recb[1])
             agendado = h*60+m
+            conjunto = int(request.POST['conjunto'])
             forma = int(request.POST['forma'])
             nome = str(request.POST['nome'])
             vel_esp = int(request.POST['vel_esp'])
-            print(f'{valor}: {agendado}, {forma}, {nome}, {vel_esp}')
+            print(f'{valor}: {conjunto}, {agendado}, {forma}, {nome}, {vel_esp}')
             servico.dxm.write_multiple_registers(107+valor*13,[vel_esp])
             sleep(1)
             servico.dxm.write_multiple_registers(109+valor*13,[forma])
@@ -180,6 +181,7 @@ class Set_dados(View):
             servico.dxm.write_multiple_registers(110+valor*13,[agendado])
             sleep(1)
             servico.oee.linhas[valor].nome = nome
+            servico.oee.linhas[valor].conjunto = conjunto
             for x in range(len(servico.oee.linhas)):
                 servico.mapa.blocos[x].nome = servico.oee.linhas[x].nome
             servico.oee.salva()
@@ -188,7 +190,8 @@ class Set_dados(View):
             scr.salvaArquivo()
             sleep(1)
             return logado('config/index.html',request,titulo='configurar DXM', msg='executado', dados=servico.oee)
-        except:
+        except Exception as EX:
+            print(f"falha em salvar - {str(EX)}")
             return logado('config/index.html',request,titulo='configurar DXM', msg='falha', dados=servico.oee)
 
 class Set_tickLog(View):
@@ -354,7 +357,37 @@ def baixaLog(request):
                     H.save()
                     print(f'salvei o historico {H.id}')
                 dxm.deleteFile('sbfile1.dat')  
-                dxm.travar()         
+                dxm.travar() 
+                # coleta grafico V 
+                if dxm.fileExist('sbfile2.dat') == False:
+                    return HttpResponse('falha - Nenhum log existente no dxm')
+                dxm.destravar()
+                arqui = dxm.getFile('sbfile2.dat')
+                dados = ''
+                for x in arqui:
+                    dados=f'{dados}{x}'
+                dados = dados.replace('\n',',')
+                dados = '[' + dados + ']'
+                dados = dados.replace('\t','')
+                dados = dados.replace(':,',':0,')
+                dados = dados.replace('\'','')
+                dados = dados.replace('\n','')
+                dados = dados.replace(',}','}')
+                dados = dados.replace(',]',']')
+                arm = open(f'file2.dat','w')
+                arm.write( dados.replace(',{',',\n{'))
+                arm.close()
+                j = json.loads(dados)
+                banco=[]
+                for x in j:
+                    banco.append(dict_to_obj(x))
+                for x in banco:
+                    calender = datetime.strptime(x.time,'%Y-%m-%d %H:%M:%S')
+                    HV = HistV(equipamento=x.id,data=calender-timedelta(hours=3),valor=int(x.vel_med))                    
+                    HV.save()
+                    print(f'salvei o historico de Grafico V {HV.id}')
+                dxm.deleteFile('sbfile2.dat')  
+                dxm.travar()       
                 return HttpResponse('ok')
             except Exception as ex:
                 return HttpResponse(f'falha - {str(ex)}')

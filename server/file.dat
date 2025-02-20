@@ -1,2 +1,12 @@
-[{"id":0,"time":"2021-06-03 19:30:01","oee":6,"dis":11,"q":100,"per":61,"vel_atu":29,"bons":0,"ruins_total":227,"t_prod":1,"t_par":8},
-{"id":0,"time":"2021-06-03 19:30:45","oee":0,"dis":0,"q":100,"per":46,"vel_atu":19,"bons":0,"ruins_total":19,"t_prod":0,"t_par":0}]
+[{"id":0,"time":"2025-01-15 18:57:07","oee":81,"dis":100,"q":100,"per":81,"vel_atu":28.470588,"bons":0,"ruins_total":968,"t_prod":34,"t_par":0},
+{"id":1,"time":"2025-01-15 18:57:07","oee":87,"dis":100,"q":100,"per":87,"vel_atu":56.941176,"bons":0,"ruins_total":1936,"t_prod":34,"t_par":0},
+{"id":2,"time":"2025-01-15 18:57:07","oee":93,"dis":100,"q":100,"per":93,"vel_atu":85.411765,"bons":0,"ruins_total":2904,"t_prod":34,"t_par":0},
+{"id":3,"time":"2025-01-15 18:57:07","oee":98,"dis":100,"q":100,"per":98,"vel_atu":113.882353,"bons":0,"ruins_total":3872,"t_prod":34,"t_par":0},
+{"id":4,"time":"2025-01-15 18:57:07","oee":94,"dis":100,"q":100,"per":94,"vel_atu":142.352941,"bons":0,"ruins_total":4840,"t_prod":34,"t_par":0},
+{"id":5,"time":"2025-01-15 18:57:07","oee":95,"dis":100,"q":100,"per":95,"vel_atu":170.823529,"bons":0,"ruins_total":5808,"t_prod":34,"t_par":0},
+{"id":0,"time":"2025-01-15 18:59:06","oee":81,"dis":100,"q":100,"per":81,"vel_atu":28.555556,"bons":0,"ruins_total":1028,"t_prod":36,"t_par":0},
+{"id":1,"time":"2025-01-15 18:59:06","oee":87,"dis":100,"q":100,"per":87,"vel_atu":57.111111,"bons":0,"ruins_total":2056,"t_prod":36,"t_par":0},
+{"id":2,"time":"2025-01-15 18:59:06","oee":94,"dis":100,"q":100,"per":94,"vel_atu":85.666667,"bons":0,"ruins_total":3084,"t_prod":36,"t_par":0},
+{"id":3,"time":"2025-01-15 18:59:06","oee":98,"dis":100,"q":100,"per":98,"vel_atu":114.222222,"bons":0,"ruins_total":4112,"t_prod":36,"t_par":0},
+{"id":4,"time":"2025-01-15 18:59:06","oee":95,"dis":100,"q":100,"per":95,"vel_atu":142.777778,"bons":0,"ruins_total":5140,"t_prod":36,"t_par":0},
+{"id":5,"time":"2025-01-15 18:59:06","oee":96,"dis":100,"q":100,"per":96,"vel_atu":171.333333,"bons":0,"ruins_total":6168,"t_prod":36,"t_par":0}]

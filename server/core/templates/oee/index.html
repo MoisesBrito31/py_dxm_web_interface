@@ -7,7 +7,15 @@
 <div class="card-title mt-5 mb-3 pt-3">
     <div class="row">
         <div class="col text-left">
-            <h2>Fábrica Visão Geral</h2>
+            <h2>Visão Geral {{nome}}</h2>
+            <div class="col text-right">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-primary" onclick="window.location.href='/oee/overview'">fábrica</button>
+                    <button type="button" class="btn btn-primary disabled" onclick="window.location.href='/oee/index/{{conjunto}}'">ao vivo</button>
+                    <button type="button" class="btn btn-primary"  onclick="window.location.href='/oee/grafico_v/{{conjunto}}'">Grafico V</button>
+                    <!--<button type="button" class="btn btn-danger">Zerar</button>-->
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -17,6 +25,7 @@
 <hr>
 <div class="container-fluid row m-auto">
     {% for l in dados.linhas %}
+        {% if l.conjunto == conjunto %}
         <div class="col-auto">
             <div id="b {{ l.id }}" class="bg-light text-center border rounded mb-5 p-2" style="min-width:250px; max-width:300px;" onclick="document.location.href='/oee/linha/{{ l.id }}'">
                 <h3 id="l {{ l.id }}">{{ l.nome }}</h3>
@@ -24,7 +33,9 @@
                 <h4><p id="p {{ l.id }}" class="p-2 rounded border border-dark text-center m-auto"> {{ l.estado }}</p>    </h4>            
             </div>
         </div>
+        {% endif %}
     {% endfor %}
+    
     
 </div>
 
@@ -57,9 +68,9 @@
         hi: 100,
     }];
 
+
+
     var linhas = {{dados.quantidade}}
-
-
 
     for(var x = 0; x < linhas; x++) {
         var a = new JustGage({
@@ -84,7 +95,23 @@
         }, 1000)
 
         setInterval(function () {
-         for (x = 0; x < data.length; x++) {                       
+            data.forEach(el => {
+                if (el.estado == "Operando"){
+                    document.getElementById(`p ${el.id}`).setAttribute("style", "color:green")
+                    document.getElementById(`b ${el.id}`).setAttribute("class", "bg-light text-center border rounded mb-5 p-2")
+                }
+                if (el.estado == "Parado"){
+                    if (document.getElementById(`b ${el.id}`).getAttribute("class") == "bg-light text-center border rounded mb-5 p-2") {
+                          document.getElementById(`b ${el.id}`).setAttribute("class", "bg-danger text-center border rounded mb-5 p-2")
+                           document.getElementById(`p ${el.id}`).setAttribute("style", "color:white")
+                      }
+                      else {
+                          document.getElementById(`b ${el.id}`).setAttribute("class", "bg-light text-center border rounded mb-5 p-2")
+                           document.getElementById(`p ${el.id}`).setAttribute("style", "color:red")
+                      }
+                }
+            });
+        /* for (x = 0; x < data.length; x++) {                       
                   if (data[x].estado == "Operando") {
                       document.getElementById(`p ${x}`).setAttribute("style", "color:green")
                       document.getElementById(`b ${x}`).setAttribute("class", "bg-light text-center border rounded mb-5 p-2")
@@ -102,7 +129,7 @@
                       
                   }
                   
-              }
+              }*/
     }, 500)
     },1000)
 
@@ -114,16 +141,28 @@
             if (this.readyState === 4 && this.status === 200) {
                 var re = this.responseText
                 //alert(re)
-                data = JSON.parse(re);
+                data = []
+                datatemp = JSON.parse(re);
+                datatemp.forEach(el => {
+                    if (el.conjunto == {{conjunto}}){
+                        data.push(el)
+                    }
+                });
+                //data = JSON.parse(re);
                 if (data[0].estado == "DXM OffLine") {
                     document.location.href = "/oee/offline";
                 }
                 else {
-                    for (x = 0; x < data.length; x++) {
+                    data.forEach(el=>{
+                        document.getElementById(`l ${el.id}`).innerHTML = el.nome
+                        document.getElementById(`p ${el.id}`).innerHTML = el.estado                        
+                        gage[el.id].refresh(el.oee)
+                    })
+                    /*for (x = 0; x < data.length; x++) {
                         document.getElementById(`l ${x}`).innerHTML = data[x].nome
                         document.getElementById(`p ${x}`).innerHTML = data[x].estado                        
                         gage[x].refresh(data[x].oee)
-                    }
+                    }*/
                 }
 
             }

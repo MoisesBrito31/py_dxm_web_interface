@@ -33,6 +33,7 @@ class Linha():
     id:int
     nome:str
     estado:str
+    conjunto:int = 0
 
     #variáveis dinamicas:
     cont_in:int=0

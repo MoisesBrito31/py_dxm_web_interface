@@ -70,12 +70,16 @@
             <div class="mb-4 mt-4 form-row">
                     {% csrf_token %}
                 <div class="col-auto mt-3">
-                    <p>Nome linha {{l.id}} : </p>
+                    <p>Nome Equipamento {{l.id}} : </p>
                     <input type="text" id="l {{l.id}}" name="nome" value="{{l.nome}}" class="mr-3 form-control" />
                 </div>
                 <div class="col-auto mt-3">
                     <p>Parada Agendado:</p>
                     <input id="{{l.id}} age" name="agendado" type="time" class="form-control text-center mr-3">
+                </div>
+                <div class="col-auto mt-3">
+                    <p>index da Linha:</p>
+                    <input id="{{l.id}} conj" name="conjunto" type="number" value="{{l.conjunto}}" class="form-control text-center mr-3">
                 </div>
                 <div class="col-auto mt-3">
                     <p>Forma de Contagem:</p>

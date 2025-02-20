@@ -28,10 +28,14 @@ def UserPermission(request, nivel_min=5):
     except:
         return False
 
+def erro(request, context={},msg="erro Geral",titulo="Erro"):
+    context['titulo'] = titulo
+    context['msg'] = msg
+    return render(request, 'erro.html', context)
 
 def logado(alvo, request, context={}, titulo='', msg='ok', dados='', nivel_min=5):
     try:
-        usu = str(request.COOKIES['userID'])
+        usu = str(request.COOKIES['userID'])        
         user = Usuario.objects.get(token=usu)
         context['user'] = user
         context['titulo'] = titulo
@@ -44,7 +48,10 @@ def logado(alvo, request, context={}, titulo='', msg='ok', dados='', nivel_min=5
         else:
             return render(request, alvo, context)
     except Exception as e:
-        print(str(e))
+        #print(str(e))
+        #context['titulo'] = 'erro'
+        #context['msg'] = f'erro interno {str(e)}'
+        #return render(request, 'erro.html', context)
         redir = alvo.split('.')[0]
         redir = redir.split('/')[0]
         response = redirect('/login')
@@ -164,7 +171,7 @@ class LoginView(View):
             use = Usuario.objects.get(email=us, senha=sh)
             use.loggin()
             use.save()
-            response = redirect('/'+alvo)
+            response = redirect('/oee/overview')
             set_cookie(response, 'userID', use.token)
             return response
         except:

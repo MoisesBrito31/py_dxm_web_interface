@@ -1,4 +1,4 @@
-linhas=4vel_esp[0]=115forma[0]=1t_p_prog[0]=60NODE[0]=0SID0[0]=20REG0[0]=1DW0[0]=1SID1[0]=20REG1[0]=3DW1[0]=1DW2[0]=2vel_esp[1]=200forma[1]=1t_p_prog[1]=61NODE[1]=1SID0[1]=2REG0[1]=17DW0[1]=1SID1[1]=2REG1[1]=18DW1[1]=1DW2[1]=1vel_esp[2]=300forma[2]=1t_p_prog[2]=62NODE[2]=1SID0[2]=3REG0[2]=17DW0[2]=1SID1[2]=3REG1[2]=18DW1[2]=1DW2[2]=1vel_esp[3]=400forma[3]=1t_p_prog[3]=63NODE[3]=1SID0[3]=4REG0[3]=17DW0[3]=1SID1[3]=4REG1[3]=18DW1[3]=1DW2[3]=1trig_log=10'inicio
+linhas=6vel_esp[0]=35forma[0]=0t_p_prog[0]=60NODE[0]=0SID0[0]=21REG0[0]=1DW0[0]=2SID1[0]=21REG1[0]=3DW1[0]=2DW2[0]=2vel_esp[1]=65forma[1]=0t_p_prog[1]=0NODE[1]=1SID0[1]=1REG0[1]=17DW0[1]=1SID1[1]=1REG1[1]=18DW1[1]=1DW2[1]=2vel_esp[2]=91forma[2]=0t_p_prog[2]=0NODE[2]=1SID0[2]=1REG0[2]=17DW0[2]=1SID1[2]=1REG1[2]=18DW1[2]=1DW2[2]=2vel_esp[3]=116forma[3]=0t_p_prog[3]=0NODE[3]=1SID0[3]=1REG0[3]=17DW0[3]=1SID1[3]=1REG1[3]=18DW1[3]=1DW2[3]=2vel_esp[4]=150forma[4]=0t_p_prog[4]=0NODE[4]=1SID0[4]=1REG0[4]=17DW0[4]=1SID1[4]=1REG1[4]=18DW1[4]=1DW2[4]=2vel_esp[5]=178forma[5]=0t_p_prog[5]=0NODE[5]=1SID0[5]=1REG0[5]=17DW0[5]=1SID1[5]=1REG1[5]=18DW1[5]=1DW2[5]=2trig_log=2'inicio
 'versin 2.1.0
 'adicao de inversao de sts e zerar multi hop 
 'linha ? composta de 1-5, conjunto de linhas vai 1-80
@@ -19,6 +19,7 @@ FOR x = 0 to 16
 	cont_ini[x]=0  
 	cont_fim[x]=0  
 	vel_atu[x]=0  
+	vel_med[x]=0   'velocidade media do equipamento calculado sobre o tempo produzido
 	zera[x]=0 
 	zeracount[x]=0
 	t_par[x]=0     
@@ -57,9 +58,17 @@ clock = "abcdef"
 FUNCTION loging	
 	clock = "\"" & LEFT(API(102),19) & "\""
 	for x=0 to linhas-1
-		outRet = FILEOUT(10,0,0,"{\"id\":" & x & ",\"time\":" & clock & ",\"oee\":" & int(oee[x]) & ",\"dis\":" & int(dis[x]) & ",\"q\":" & int(q[x]) & ",\"per\":" & int(per[x]) & ",\"vel_atu\":" & vel_atu[x] & ",\"bons\":" & cont_out[x] & ",\"ruins_total\":" & cont_in[x] & ",\"t_prod\":" & t_prod[x] & ",\"t_par\":" & t_par[x] & "}"&"\r\n")		
+		outRet = FILEOUT(10,0,0,"{\"id\":" & x & ",\"time\":" & clock & ",\"oee\":" & int(oee[x]) & ",\"dis\":" & int(dis[x]) & ",\"q\":" & int(q[x]) & ",\"per\":" & int(per[x]) & ",\"vel_atu\":" & vel_med[x] & ",\"bons\":" & cont_out[x] & ",\"ruins_total\":" & cont_in[x] & ",\"t_prod\":" & t_prod[x] & ",\"t_par\":" & t_par[x] & "}"&"\r\n")		
 	next x		
 END FUNCTION
+
+FUNCTION logingTurno	
+	clock = "\"" & LEFT(API(102),19) & "\""
+	for x=0 to linhas-1
+		outRet = FILEOUT(11,0,0,"{\"id\":" & x & ",\"time\":" & clock & ",\"vel_med\":" & vel_med[x] & "}"&"\r\n")		
+	next x		
+END FUNCTION
+
 
 FUNCTION inPuts
 	linhas=GETREG(90,199,4)	
@@ -105,7 +114,7 @@ FUNCTION outPuts
 		WrErr = SETREG(104+(13*x), dis[x], 199, 4)
 		WrErr = SETREG(105+(13*x), cont_ini[x], 199, 4) 
 		WrErr = SETREG(106+(13*x), cont_fim[x], 199, 4) 
-		WrErr = SETREG(107+(13*x), vel_atu[x], 199, 4) 
+		WrErr = SETREG(107+(13*x), vel_med[x], 199, 4)
 		WrErr = SETREG(109+(13*x), zera[x], 199, 4)
 		WrErr = SETREG(112+(13*x), t_par[x], 199, 4)  
 		WrErr = SETREG(113+(13*x), t_prod[x], 199, 4)
@@ -115,18 +124,18 @@ END FUNCTION
 FUNCTION Disponibilidade
 	FOR x=0 to linhas-1
 		t_temp=0
-		IF maq_sts[x] = DW2[x]-1 Then		
-			t_parS[x] = t_parS[x]+2	
-			IF t_parS[x] > 59 Then
-				t_par[x] = t_par[x]+1
-				t_parS[x] = 0
-			END IF 
-		Else
+		IF maq_sts[x] <> DW2[x]-1 Then		
 			t_prodS[x] = t_prodS[x]+2	
 			IF t_prodS[x] > 59 Then
 				t_prod[x] = t_prod[x]+1
 				t_prodS[x] = 0
-			END IF 
+			END IF			
+		Else
+			t_parS[x] = t_parS[x]+2	
+			IF t_parS[x] > 59 Then
+				t_par[x] = t_par[x]+1
+				t_parS[x] = 0
+			END IF  
 		END IF
 		
 		t_temp=t_par[x]-t_p_prog[x]
@@ -156,13 +165,11 @@ FUNCTION performace
 			END IF			
 		END IF
 			per_temp =(t_par+t_prod)*vel_esp[x]
+			vel_med[x] = cont_in[x]/(t_par+t_prod)
 			if per_temp<=0 then
 				per_temp=vel_esp[x]
 			end if
 			per[x] = cont_in[x]/per_temp*100
-			if per[x]>100 then
-				per[x]=100
-			end if
 	NEXT x	
 	
 	
@@ -202,7 +209,7 @@ END FUNCTION
 
 FUNCTION emular
 	FOR x = 0 to linhas-1	
-		erro = SETREG(2+x*5,emuContador,199,4)
+		erro = SETREG(2+x*5,emuContador[x],199,4)
 		if maq_sts[x] = 0 THEN 
 			emuContador[x]=emuContador[x]+x+1
 		END IF
@@ -221,6 +228,7 @@ function zerar
 	next x
 	
 	IF reset_geral = 1 THEN
+		logingTurno()
 		loging()
 	END IF
 	

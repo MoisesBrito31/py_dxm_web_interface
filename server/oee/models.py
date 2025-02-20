@@ -20,3 +20,28 @@ class Hist(models.Model):
 
     def __str__(self):
         return str(self.linha)
+
+
+class Linha(models.Model):
+    index = models.IntegerField("index")
+    nome = models.CharField("nome",max_length=20)
+
+    class Meta:
+        verbose_name = 'Linha'
+        verbose_name_plural = 'Linhas'        
+
+    def __str__(self):
+        return str(self.nome)
+
+
+class HistV(models.Model):   
+    data = models.DateTimeField("horario")
+    equipamento = models.IntegerField("Equipamento")
+    valor = models.IntegerField("Velocidade")
+
+    class Meta:
+        verbose_name = 'Log V'
+        verbose_name_plural = 'Logs V'        
+
+    def __str__(self):
+        return str(self.equipamento)

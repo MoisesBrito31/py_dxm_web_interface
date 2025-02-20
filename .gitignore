@@ -3,6 +3,5 @@
 __pycache__
 venv
 build
-*.sqlite3
 *.exe
 

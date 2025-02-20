@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block context %}
+
+<script src="{% static 'js/moment.js'%}"></script>
+<script src="{% static 'js/Chart.min.js'%}"></script>
+<script src="{% static 'js/Chart.js'%}"></script>
+<script src="{% static 'js/chart.util.js'%}"></script>
+
+<div class="card-title mt-5 mb-3 pt-3">
+    <div class="row">
+        <div class="col text-left"><h2>{{linha}} - Grafico V</h2></div>
+
+        <div class="col text-right">
+            <div class="btn-group">
+                <button type="button" class="btn btn-primary" onclick="window.location.href='/oee/overview'">fábrica</button>
+                <button type="button" class="btn btn-primary" onclick="window.location.href='/oee/index/{{conjunto}}'">ao vivo</button>
+                <button type="button" class="btn btn-primary disabled">Histórico</button>
+                <!--<button type="button" class="btn btn-danger">Zerar</button>-->
+            </div>
+        </div>
+    </div>
+
+</div>
+<form method="post" action="/oee/grafico_v/{{linhaIndex}}">
+    {% csrf_token %}
+    <div class="m-auto mt-5 form-inline form-group">
+        <label>data:</label>
+        <input type="date" class="form-control mr-3" name="ini" id="ini" value="{{inis}}" />
+        <label>turno</label>
+        
+        <select class="form-control mr-3" id="turno" name="turno">
+            {% for l in turnoList %}
+            <option value="{{l}}" {% if turno == l %} selected="selected" {% endif %}>{{l}}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-primary mr-3">Aplicar</button>
+        <!--<button type="button" class="btn btn-primary" onclick="gerarRelatorio()">Relatório</button>-->
+    </div>
+</form>
+
+
+<hr>
+<div class="container-fluid m-auto">
+
+    
+    <div class="m-auto" style="width:80%;">
+        <canvas id="canvas"></canvas>
+    </div>
+    
+    <hr />
+   
+</div>
+
+<script>
+		var config = {
+			type: 'line',
+			data: {
+                labels: [
+                    {% for equi in equipamentos %}
+                    '{{equi}}',
+                    {% endfor %}
+                ],
+				datasets: [{
+                    label: 'velocidade (p/m)',
+					backgroundColor: window.chartColors.red,
+					borderColor: window.chartColors.red,
+					data: [
+                        {% for v in dados %}
+                        {{v.valor}},
+                        {% endfor %}
+                    ],
+					fill: false,
+				}]
+			},
+			options: {
+				responsive: true,
+				title: {
+					display: true,
+					text: '{{turno}} com fechamento {{data}}'
+				},
+				tooltips: {
+					mode: 'index',
+					intersect: false,
+				},
+				hover: {
+					mode: 'nearest',
+					intersect: true
+				},
+				scales: {
+					xAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'Equipamento'
+						}
+					}],
+					yAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'Velocidade Media'
+						}
+					}]
+				}
+			}
+		};
+
+        setTimeout(function(){
+            var ctx = document.getElementById('canvas').getContext('2d');
+			window.myLine = new Chart(ctx, config);
+        },500)
+
+
+        var colorNames = Object.keys(window.chartColors);
+
+        function gerarRelatorio() {
+        var ini = document.getElementById("ini").value
+        var fim = document.getElementById("fim").value
+        var xhp = new XMLHttpRequest()
+        var endres = `/oee/relatorio/${ini}/${fim}/{{linha_id}}`
+        document.location.href=endres
+    }
+
+</script>
+
+{% endblock %}

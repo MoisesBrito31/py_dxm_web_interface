@@ -5,6 +5,7 @@ from dxm_oee_modulo.oee_modulo.oee import OEE
 from dxm_oee_modulo.protocolo.mapa import Mapa
 from dxm_oee_modulo.protocolo.protocolo import Protocolo
 from datetime import datetime, timedelta
+from oee.models import HistV
 
 mapa = Mapa.carrega('','base.mapa')
 oee = OEE.carrega('','OEE.data')
@@ -146,6 +147,38 @@ class Ciclo():
                                 H.save()
                                 print(f'salvei o historico {H.id}')
                             dxm.deleteFile('sbfile1.dat')  
+                            dxm.travar() 
+                            print(f'executado o log automatico - {datetime.now()}')
+                        #dataLog2 contendo o fechamento do turno:
+                        if dxm.fileExist('sbfile2.dat') == False:
+                            print('falha - Nenhum log de turno existente no dxm')
+                        else:
+                            dxm.destravar()
+                            arqui = dxm.getFile('sbfile2.dat')
+                            dados = ''
+                            for x in arqui:
+                                dados=f'{dados}{x}'
+                            dados = dados.replace('\n',',')
+                            dados = '[' + dados + ']'
+                            dados = dados.replace('\t','')
+                            dados = dados.replace(':,',':0,')
+                            dados = dados.replace('\'','')
+                            dados = dados.replace('\n','')
+                            dados = dados.replace(',}','}')
+                            dados = dados.replace(',]',']')
+                            arm = open(f'file2.dat','w')
+                            arm.write( dados.replace(',{',',\n{'))
+                            arm.close()
+                            j = json.loads(dados)
+                            banco=[]
+                            for x in j:
+                                banco.append(dict_to_obj(x))
+                            for x in banco:
+                                calender = datetime.strptime(x.time,'%Y-%m-%d %H:%M:%S')
+                                HV = HistV(equipamento=x.id,data=calender-timedelta(hours=3),valor=int(x.vel_med))                    
+                                HV.save()
+                                print(f'salvei o historico {HV.id}')
+                            dxm.deleteFile('sbfile2.dat')  
                             dxm.travar() 
                             print(f'executado o log automatico - {datetime.now()}') 
                     except Exception as ex:
