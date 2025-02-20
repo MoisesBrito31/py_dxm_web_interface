@@ -98,10 +98,12 @@ class GraficoVView(View):
         linhas = []
         equipamentos = []
         dados =[]
+        esp = []
         turno = ""
         for l in servico.oee.linhas:
             if l.conjunto == id:
                 linhas.append(l.id)
+                esp.append(l.vel_esp)
                 equipamentos.append(l.nome)
         for eq in linhas:
             leitura = HistV.objects.filter(equipamento=eq).first()
@@ -125,7 +127,8 @@ class GraficoVView(View):
             "linha":nomeLinha,
             "linhaIndex":id,
             "data":dados[0].data,
-            "equipamentos":equipamentos
+            "equipamentos":equipamentos,
+            "esp": esp
         })
     def post(self,request,id):
         turnoList=[]
@@ -144,9 +147,11 @@ class GraficoVView(View):
         linhas = []
         equipamentos = []
         dados =[]
+        esp =[]
         for l in servico.oee.linhas:
             if l.conjunto == id:
                 linhas.append(l.id)
+                esp.append(l.vel_esp)
                 equipamentos.append(l.nome)
         for eq in linhas:
             leitura = HistV.objects.filter(Q(equipamento__exact=eq) & Q(data__gt=consulIni) & Q(data__lt=consulFim)).order_by('data')
@@ -162,7 +167,8 @@ class GraficoVView(View):
                 "linha":nomeLinha,
                 "linhaIndex":id,
                 "data":dados[0].data,
-                "equipamentos":equipamentos
+                "equipamentos":equipamentos,
+            "esp": esp
             })
         else:
             return erro(request,msg="Erro ao acessar o bando de dados, retorno nulo",titulo="Erro no banco")

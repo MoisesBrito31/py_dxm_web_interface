@@ -62,12 +62,22 @@
                     {% endfor %}
                 ],
 				datasets: [{
-                    label: 'velocidade (p/m)',
-					backgroundColor: window.chartColors.red,
-					borderColor: window.chartColors.red,
+                    label: 'Atual (p/m)',
+					backgroundColor: window.chartColors.blue,
+					borderColor: window.chartColors.blue,
 					data: [
                         {% for v in dados %}
                         {{v.valor}},
+                        {% endfor %}
+                    ],
+					fill: false,
+				},{
+                label: 'Esperado (p/m)',
+					backgroundColor: window.chartColors.red,
+					borderColor: window.chartColors.red,
+					data: [
+                        {% for e in esp %}
+                        {{e}},
                         {% endfor %}
                     ],
 					fill: false,
