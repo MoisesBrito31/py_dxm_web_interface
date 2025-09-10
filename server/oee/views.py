@@ -104,7 +104,7 @@ class GraficoVView(View):
             if l.conjunto == id:
                 linhas.append(l.id)
                 esp.append(l.vel_esp)
-                equipamentos.append(l.nome)
+                equipamentos.append({"nome":l.nome,"id":l.id})
         for eq in linhas:
             leitura = HistV.objects.filter(equipamento=eq).first()
             dados.append(leitura)
@@ -128,7 +128,8 @@ class GraficoVView(View):
             "linhaIndex":id,
             "data":dados[0].data,
             "equipamentos":equipamentos,
-            "esp": esp
+            "esp": esp,
+            "qtdEquip": len(equipamentos)
         })
     def post(self,request,id):
         turnoList=[]
@@ -199,6 +200,17 @@ def get_linha(request,id):
     if UserPermission(request, 3):
         l = servico.oee.linhas[id]
         ret = f'{{\"nome\":\"{l.nome}\",\"estado\":\"{l.estado}\",\"oee\":{l.oee},\"dis\":{l.dis},\"q\":{l.q},\"per\":{l.per}, \"t_prod\":{l.t_prod},\"t_par\":{l.t_par},\"t_p_prog\":{l.t_p_prog},\"cont_in\":{l.cont_in},\"cont_out\":{l.cont_out},\"vel_atu\":{l.vel_atu},\"vel_esp\":{l.vel_esp}}}'
+        return HttpResponse(ret)
+    else:
+        return HttpResponse('falha')
+    
+def get_v_aovivo(request,id):
+    if UserPermission(request, 3):
+        ret = "["
+        for l in servico.oee.linhas:
+            if l.conjunto == id:
+                ret=f'{ret}{{\"nome\":\"{l.nome}\",\"vel_atu\":{l.vel_atu},\"vel_esp\":{l.vel_esp}}},'
+        ret = f'{ret[:len(ret)-1]}]'
         return HttpResponse(ret)
     else:
         return HttpResponse('falha')

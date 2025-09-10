@@ -34,7 +34,11 @@
             <option value="{{l}}" {% if turno == l %} selected="selected" {% endif %}>{{l}}</option>
             {% endfor %}
         </select>
-        <button type="submit" class="btn btn-primary mr-3">Aplicar</button>
+        <button id="butBuscar" type="submit" class="btn btn-primary mr-3">Aplicar</button>
+        <button  type="button" class="btn btn-primary mr-3" onclick="toggleAoVivo()">
+            <span id="butAovivo">Ao Vivo</span>
+        </button>
+        <span id="splint" class="spinner-border spinner-border-sm" style="visibility:collapse"></span>
         <!--<button type="button" class="btn btn-primary" onclick="gerarRelatorio()">Relatório</button>-->
     </div>
 </form>
@@ -53,12 +57,18 @@
 </div>
 
 <script>
+        var roda = document.getElementById("splint");
+        var butAovivo = document.getElementById("butAovivo");
+        var butBuscar = document.getElementById("butBuscar");
+        var aovivo = false
+        var aovioData_vel_atu = []
+        var aovioData_vel_esp = []
 		var config = {
 			type: 'line',
 			data: {
                 labels: [
                     {% for equi in equipamentos %}
-                    '{{equi}}',
+                    '{{equi.nome}}',
                     {% endfor %}
                 ],
 				datasets: [{
@@ -121,6 +131,55 @@
 			window.myLine = new Chart(ctx, config);
         },500)
 
+        setInterval(function(){
+            if (aovivo == true){
+                getAoVivo()
+            }
+        },5000)
+
+        function toggleAoVivo(){
+            aovivo = !aovivo
+            if (aovivo == false){
+                roda.setAttribute("style","visibility:collapse")
+                butBuscar.removeAttribute("disabled")
+                butAovivo.innerHTML = "Ao vivo"
+            }else{
+                getAoVivo()
+                 roda.setAttribute("style","visibility:visible")
+                 butBuscar.setAttribute("disabled","true")
+                 butAovivo.innerHTML = "OFF"
+            }
+        }
+
+        function getAoVivo() {
+            aovioData_vel_atu = []
+            aovioData_vel_esp = []
+         
+            
+                    
+                      var xhp = new XMLHttpRequest()
+        xhp.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 200) {
+                data = JSON.parse(this.responseText)
+                data.forEach(ele => {
+                    aovioData_vel_atu.push(ele.vel_atu)
+                    aovioData_vel_esp.push(ele.vel_esp)
+                });
+                
+                
+                myLine.data.datasets[0].data = aovioData_vel_esp
+                myLine.data.datasets[1].data = aovioData_vel_atu
+                console.log(aovioData_vel_atu)
+                console.log(aovioData_vel_esp)       
+                myLine.update() 
+                }
+            }
+        
+        xhp.open("Get", "/oee/get_v_aovivo/{{conjunto}}");
+        xhp.send();
+       
+        
+    }
 
         var colorNames = Object.keys(window.chartColors);
 
